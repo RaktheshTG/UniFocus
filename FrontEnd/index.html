@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniFocus</title>
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+  <div class="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="#home">UniFocus</a>
+
+      <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#modules">Modules</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </div>
+
+      <div class="nav-actions">
+        <button class="pill" id="themeBtn" type="button" onclick="toggleTheme()">Dark</button>
+        <a class="pill" id="loginLink" href="login page.html">Login</a>
+        <a class="cta" id="signupLink" href="SignUp.html">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <header id="home" class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy card hero-card">
+        <div class="hero-tag">Minimal student workspace</div>
+        <h1>
+          Every day, it gets a little easier.<br>
+          But you gotta do it every day, that's the hard part.
+        </h1>
+        <p>
+          UniFocus is your minimal productivity hub: habits, timetable, to-do, Pomodoro, and stress relief quotes
+          built to keep you consistent without distractions.
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="primaryCta" type="button" onclick="goPrimary()">Get Started</button>
+          <button class="btn btn-secondary" type="button" onclick="document.getElementById('modules').scrollIntoView({ behavior: 'smooth' })">Explore Modules</button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-chip">
+            <span class="stat-label">Focus tools</span>
+            <strong>Habits, timer, planner</strong>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-label">Landing page</span>
+            <strong>Shared for every visitor</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-media card">
+        <img
+          src="https://cdn.prod.website-files.com/6055681972a8dc68515eab60/677b1f7ddc3715c4813876df_0-DailyHabits-720p-skip4thframe-compressed.gif"
+          alt="UniFocus preview"
+        >
+      </div>
+    </div>
+  </header>
+
+  <section id="features" class="section-shell">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">Features</span>
+        <h2 class="section-title">Minimalistic Habit Tracking</h2>
+        <p class="section-subtitle">The only right choice to track your goal progress.</p>
+      </div>
+
+      <div class="grid">
+        <article class="card feature-card">
+          <div class="badge">Progress</div>
+          <h3>Track your progress</h3>
+          <p>Get a clear overview of habits, goals, and streaks in one clean board.</p>
+        </article>
+
+        <article class="card feature-card">
+          <div class="badge">Consistency</div>
+          <h3>Maintain the streak</h3>
+          <p>The more days you chain in a row, the less likely you are to quit.</p>
+        </article>
+
+        <article class="card feature-card">
+          <div class="badge">Discipline</div>
+          <h3>Gain control over time</h3>
+          <p>Build discipline by showing up daily so small wins add up fast.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="modules" class="section-shell">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">Modules</span>
+        <h2 class="section-title">All-in-one Student Toolkit</h2>
+        <p class="section-subtitle">Pick a module and lock in with no clutter, just focus.</p>
+      </div>
+
+      <div class="modules">
+        <div class="card panel">
+          <h3>Modules included</h3>
+          <ul>
+            <li><b>Daily Habit Tracker</b> - streaks and progress overview</li>
+            <li><b>Study Timetable</b> - plan your week and avoid chaos</li>
+            <li><b>To-Do List</b> - pending to accomplished workflow</li>
+            <li><b>Pomodoro Timer</b> - sleek timer for deep focus</li>
+            <li><b>Stress Management</b> - motivational quotes and calm mode</li>
+          </ul>
+
+          <div class="mini-cta">
+            <button class="btn btn-primary" type="button" onclick="window.location.href='SignUp.html'">Create Account</button>
+            <button class="btn btn-secondary" type="button" onclick="window.location.href='login page.html'">I already have one</button>
+          </div>
+        </div>
+
+        <div class="card panel" id="about">
+          <h3>Why UniFocus?</h3>
+          <ul>
+            <li>Minimal design means fewer distractions</li>
+            <li>Everything students need in one place</li>
+            <li>Simple UI you can explain in viva</li>
+            <li>Easy to extend later with SQL and login</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="contact" class="footer-shell">
+    <div class="container card footer-card">
+      <div class="footer-grid">
+        <div>
+          <h4>UniFocus</h4>
+          <p>A minimal student productivity portal: habits, timetable, to-do, Pomodoro, and stress relief.</p>
+        </div>
+
+        <div class="footer-links">
+          <h4>Pages</h4>
+          <a href="login page.html">Login</a>
+          <a href="SignUp.html">Sign Up</a>
+          <a href="#modules">Modules</a>
+          <a href="#features">Features</a>
+        </div>
+
+        <div class="footer-links">
+          <h4>Project</h4>
+          <a href="#about">About</a>
+          <a href="#contact">Contact</a>
+          <a href="#home">Back to top</a>
+        </div>
+      </div>
+
+      <div class="copyright">
+        &copy; <span id="year"></span> UniFocus • Built for Web Dev / DBMS Project
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/index.js"></script>
+</body>
+</html>

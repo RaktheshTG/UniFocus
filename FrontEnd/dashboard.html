@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>UniFocus Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+
+<body>
+  <div class="dashboard-backdrop" id="dashboardBackdrop"></div>
+
+  <div class="navbar">
+    <div class="nav-side nav-left">
+      <div class="nav-pill-bar">
+        <a class="nav-orb" href="WebDev.html" aria-label="Home">
+          <span class="nav-emoji">🏠</span>
+          <span class="nav-orb-label">Home</span>
+        </a>
+        <a class="nav-orb active" href="dashboard.html" aria-label="Dashboard">
+          <span class="nav-emoji">📊</span>
+          <span class="nav-orb-label">Dashboard</span>
+        </a>
+      </div>
+    </div>
+    <div class="nav-side nav-right">
+      <div class="nav-pill-bar">
+        <button class="nav-orb" onclick="toggleTheme()" id="themeBtn" type="button" aria-label="Theme">
+          <span class="nav-emoji" id="themeGlyph">Light</span>
+          <span class="nav-orb-label" id="themeHint">Dark</span>
+        </button>
+        <button class="nav-orb" onclick="logout()" type="button" aria-label="Logout">
+          <span class="nav-emoji">↗</span>
+          <span class="nav-orb-label">Logout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="welcome">
+    <h1>Welcome to UniFocus<span id="userName"></span> 👋</h1>
+    <h2>What would you like to work on today?</h2>
+  </div>
+
+  <div class="stats primary-stats">
+  <div class="stat-card">
+    <div class="stat-label">Studied Today</div>
+    <div class="stat-value"><span id="minutesToday">0</span> <span class="stat-unit">min</span></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Focus Sessions</div>
+    <div class="stat-value"><span id="sessionsToday">0</span> <span class="stat-unit">done</span></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Streak</div>
+    <div class="stat-value"><span id="streakToday">0</span> <span class="stat-unit">🔥</span></div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Breaks</div>
+    <div class="stat-value"><span id="breaksToday">0</span> <span class="stat-unit">taken</span></div>
+  </div>
+</div>
+
+  <div class="cards">
+    <div class="card" onclick="go('habit.html')">Habit Tracker</div>
+    <div class="card" onclick="go('pomodoro.html')">Pomodoro Timer</div>
+    <div class="card" onclick="go('stress.html')">Stress Relief</div>
+    <div class="card" onclick="go('todo.html')">To-Do List</div>
+    <div class="card" onclick="go('timetable.html')">Timetable</div>
+    <div class="card" onclick="go('progress.html')">Today's Progress</div>
+    <div class="card" onclick="go('calendar.html')">Calendar</div>
+    <div class="card" onclick="go('recommendation.html')">Recommendation</div>
+  </div>
+
+  <div style="width:min(1100px,92%); margin:0 auto 50px;">
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-start; margin:10px 0 14px;">
+      <button class="nav-btn" id="weeklyBtn" type="button" onclick="setRange('weekly')" style="border-color:rgba(0,0,0,0.18); color:var(--text); background:rgba(255,255,255,0.40);">Weekly</button>
+      <button class="nav-btn" id="monthlyBtn" type="button" onclick="setRange('monthly')" style="border-color:rgba(0,0,0,0.18); color:var(--text); background:rgba(255,255,255,0.40);">Monthly</button>
+    </div>
+
+    <div class="stats" style="grid-template-columns:repeat(3, 1fr); width:100%; margin:0;">
+      <div class="stat-card">
+        <div class="stat-label">Total Study Hours</div>
+        <div class="stat-value"><span id="totalHours">0</span> <span class="stat-unit">hrs</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Sessions</div>
+        <div class="stat-value"><span id="totalSessions">0</span> <span class="stat-unit">focus</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Study / Day</div>
+        <div class="stat-value"><span id="avgHours">0</span> <span class="stat-unit">hrs</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="visual-panel">
+    <div>
+      <div class="stat-label">Shared Background Image</div>
+      <div class="visual-sub">Paste an image URL once and both Dashboard and Pomodoro will use it with a light blur so the image stays clearly visible.</div>
+    </div>
+    <div class="visual-controls">
+      <input id="dashboardBackgroundImage" class="visual-input" type="text" placeholder="Paste image URL">
+      <label class="visual-toggle">
+        <input id="dashboardImageBlurEnabled" type="checkbox" checked>
+        <span>Glass blur</span>
+      </label>
+      <label class="visual-range">
+        <span>Blur</span>
+        <input id="dashboardImageBlurAmount" type="range" min="0" max="18" value="4">
+      </label>
+      <button class="nav-btn visual-btn" type="button" onclick="saveBackgroundImage()">Apply Image</button>
+      <button class="nav-btn visual-btn secondary" type="button" onclick="clearBackgroundImage()">Clear</button>
+    </div>
+  </div>
+
+
+
+  <div class="toast" id="dashboardToast"></div>
+  <footer>
+    © <span id="year"></span> UniFocus • Designed for Focus
+  </footer>
+  <script src="../js/dashboard.js"></script>
+</body>
+</html>

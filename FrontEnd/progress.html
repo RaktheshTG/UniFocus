@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Today's Progress • UniFocus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/progress.css">
+</head>
+
+<body>
+  <div class="navbar">
+    <div class="nav-side nav-left">
+      <div class="nav-pill-bar">
+        <a class="nav-orb" href="WebDev.html" aria-label="Home">
+          <span class="nav-emoji">&#127968;</span>
+          <span class="nav-orb-label">Home</span>
+        </a>
+        <a class="nav-orb active" href="progress.html" aria-label="Progress">
+          <span class="nav-emoji">&#128200;</span>
+          <span class="nav-orb-label">Progress</span>
+        </a>
+      </div>
+    </div>
+    <div class="nav-side nav-right">
+      <div class="nav-pill-bar">
+        <button class="nav-orb" type="button" onclick="toggleTheme()" aria-label="Theme">
+          <span class="nav-emoji">&#9681;</span>
+          <span class="nav-orb-label" id="themeBtn">Dark</span>
+        </button>
+        <a class="nav-orb" href="dashboard.html" aria-label="Dashboard">
+          <span class="nav-emoji">&#128202;</span>
+          <span class="nav-orb-label">Dashboard</span>
+        </a>
+        <a class="nav-orb" href="pomodoro.html" aria-label="Pomodoro">
+          <span class="nav-emoji">&#9201;</span>
+          <span class="nav-orb-label">Pomodoro</span>
+        </a>
+        <a class="nav-orb" href="login page.html" aria-label="Logout">
+          <span class="nav-emoji">&#10138;</span>
+          <span class="nav-orb-label">Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="title">
+      <h1>Today's Progress</h1>
+      <div class="sub">All focus sessions (completed + counted partial minutes), with notes and streak.</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Studied Today</div>
+        <div class="stat-value"><span id="minutesToday">0</span> <span class="stat-unit">min</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Completed Focus Sessions</div>
+        <div class="stat-value"><span id="sessionsToday">0</span> <span class="stat-unit">done</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Breaks</div>
+        <div class="stat-value"><span id="breaksToday">0</span> <span class="stat-unit">taken</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Streak</div>
+        <div class="stat-value streak">
+          <span class="fire" id="fireBox">🔥</span>
+          <span><span id="streakToday">0</span> <span class="stat-unit">in a row</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>
+        Sessions
+        <span class="actions">
+          <button class="btn" type="button" onclick="refresh()">Refresh</button>
+          <button class="btn danger" type="button" onclick="clearToday()">Clear today</button>
+        </span>
+      </h2>
+      <div class="list" id="list"></div>
+      <div id="empty" class="meta" style="display:none; text-align:center; padding:16px 8px;">No sessions yet. Do a Pomodoro, or count a partial reset.</div>
+    </div>
+
+    <div class="panel">
+      <h2>
+        Last 7 days
+        <span class="actions">
+          <button class="btn" type="button" onclick="renderChart()">Update chart</button>
+        </span>
+      </h2>
+      <div class="meta" style="margin-bottom:10px;">Hours studied per day (includes counted partial minutes).</div>
+      <div class="chartWrap">
+        <canvas id="weekChart" width="1100" height="260"></canvas>
+      </div>
+    </div>
+
+    <footer>© <span id="year"></span> UniFocus</footer>
+  </div>
+  <script src="../js/progress.js"></script>
+</body>
+</html>

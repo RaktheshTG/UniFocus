@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7-Day Habit Tracker</title>
+  <link rel="stylesheet" href="/css/habit.css">
+</head>
+
+<body>
+
+<div class="navbar">
+  <div class="nav-side nav-left">
+    <div class="nav-pill-bar">
+      <a class="nav-orb" href="WebDev.html" aria-label="Home">
+        <span class="nav-emoji">&#127968;</span>
+        <span class="nav-orb-label">Home</span>
+      </a>
+      <a class="nav-orb active" href="habit.html" aria-label="Habits">
+        <span class="nav-emoji">&#127793;</span>
+        <span class="nav-orb-label">Habits</span>
+      </a>
+    </div>
+  </div>
+  <div class="nav-side nav-right">
+    <div class="nav-pill-bar">
+      <button class="nav-orb" type="button" onclick="toggleTheme()" aria-label="Theme">
+        <span class="nav-emoji">&#9681;</span>
+        <span class="nav-orb-label" id="themeBtn">Dark</span>
+      </button>
+      <a class="nav-orb" href="dashboard.html" aria-label="Dashboard">
+        <span class="nav-emoji">&#128202;</span>
+        <span class="nav-orb-label">Dashboard</span>
+      </a>
+      <a class="nav-orb" href="login page.html" aria-label="Logout">
+        <span class="nav-emoji">&#10138;</span>
+        <span class="nav-orb-label">Logout</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <h1>7-Day Habit Tracker</h1>
+  <div class="sub">Tap any day dot to mark it done. Filled dot = completed.</div>
+
+  <div class="panel">
+    <div class="table-wrap">
+      <table id="habitTable">
+        <thead>
+          <tr>
+            <th>Habit</th>
+            <th class="dayHead"></th>
+            <th class="dayHead"></th>
+            <th class="dayHead"></th>
+            <th class="dayHead"></th>
+            <th class="dayHead"></th>
+            <th class="dayHead"></th>
+            <th class="dayHead"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="habit-name">Drink Water</td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+          </tr>
+          <tr>
+            <td class="habit-name">Study</td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+            <td class="cell"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="controls">
+      <input type="text" id="newHabit" placeholder="New habit name">
+      <button type="button" onclick="addHabit()">Add Habit</button>
+      <button type="button" onclick="resetAll()">Reset</button>
+    </div>
+
+    <div class="hint">Tip: press Enter after typing a habit name. Right-click a habit name to change or delete.</div>
+  </div>
+
+  <div id="habitContextMenu" class="context-menu">
+    <button type="button" data-action="rename">Change name</button>
+    <button type="button" data-action="delete" class="danger">Delete</button>
+  </div>
+
+  <footer>© <span id="year"></span> UniFocus</footer>
+</div>
+  <script src="../js/habit.js"></script>
+</body>
+</html>

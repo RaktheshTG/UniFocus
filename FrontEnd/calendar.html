@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calendar • UniFocus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/calendar.css">
+</head>
+
+<body>
+  <div class="navbar">
+    <div class="nav-side nav-left">
+      <div class="nav-pill-bar">
+        <a class="nav-orb" href="WebDev.html" aria-label="Home">
+          <span class="nav-emoji">&#127968;</span>
+          <span class="nav-orb-label">Home</span>
+        </a>
+        <a class="nav-orb active" href="calendar.html" aria-label="Calendar">
+          <span class="nav-emoji">&#128467;</span>
+          <span class="nav-orb-label">Calendar</span>
+        </a>
+      </div>
+    </div>
+    <div class="nav-side nav-right">
+      <div class="nav-pill-bar">
+        <button class="nav-orb" type="button" onclick="toggleTheme()" aria-label="Theme">
+          <span class="nav-emoji">&#9681;</span>
+          <span class="nav-orb-label" id="themeBtn">Dark</span>
+        </button>
+        <a class="nav-orb" href="dashboard.html" aria-label="Dashboard">
+          <span class="nav-emoji">&#128202;</span>
+          <span class="nav-orb-label">Dashboard</span>
+        </a>
+        <a class="nav-orb" href="login page.html" aria-label="Logout">
+          <span class="nav-emoji">&#10138;</span>
+          <span class="nav-orb-label">Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="title">
+      <h1>Calendar</h1>
+      <div class="sub">Click any day to add a note or task. Days are softly colored by your study time.</div>
+    </div>
+
+    <div class="panel">
+      <div class="cal-header">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button class="chip" type="button" onclick="prevMonth()">←</button>
+          <div class="monthTitle" id="monthTitle">Month YYYY</div>
+          <button class="chip" type="button" onclick="nextMonth()">→</button>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button class="chip" type="button" onclick="goToday()">Today</button>
+        </div>
+      </div>
+
+      <div class="weekdays">
+        <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+      </div>
+
+      <div class="grid" id="grid"></div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="swatch" style="background:rgba(255,255,255,0.06)"></span>0 hrs</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--g1)"></span>0–1 hr</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--g2)"></span>1–2 hrs</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--g3)"></span>2–4 hrs</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--g4)"></span>4+ hrs</div>
+        <div class="legend-item"><span class="swatch" style="background:rgba(59,130,246,0.85)"></span>Note</div>
+        <div class="legend-item"><span class="swatch" style="background:rgba(255,122,24,0.85)"></span>Task</div>
+      </div>
+    </div>
+
+    <footer>© <span id="year"></span> UniFocus</footer>
+  </div>
+
+  <div id="calMenu" class="context-menu" role="menu" aria-hidden="true">
+    <div class="head" id="calMenuHead">Day</div>
+    <button type="button" data-action="add_note">Add note <span style="opacity:0.75;">(blue)</span></button>
+    <button type="button" data-action="add_task">Add task <span style="opacity:0.75;">(orange)</span></button>
+    <button type="button" data-action="details">Details</button>
+    <button type="button" data-action="clear" class="danger">Clear this day</button>
+  </div>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-top">
+        <div>
+          <div class="modal-title" id="modalTitle">Edit</div>
+          <div class="modal-sub" id="modalSub"> </div>
+        </div>
+        <button class="xbtn" type="button" onclick="closeModal()">✕</button>
+      </div>
+
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  <script src="../js/calendar.js"></script>
+</body>
+</html>

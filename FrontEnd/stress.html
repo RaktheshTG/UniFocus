@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stress Relief Page</title>
+  <link rel="stylesheet" href="/css/stress.css">
+</head>
+
+<body>
+
+<div class="navbar">
+  <div class="nav-side nav-left">
+    <div class="nav-pill-bar">
+      <a class="nav-orb" href="WebDev.html" aria-label="Home">
+        <span class="nav-emoji">&#127968;</span>
+        <span class="nav-orb-label">Home</span>
+      </a>
+      <a class="nav-orb active" href="stress.html" aria-label="Stress Relief">
+        <span class="nav-emoji">&#127807;</span>
+        <span class="nav-orb-label">Stress</span>
+      </a>
+    </div>
+  </div>
+  <div class="nav-side nav-right">
+    <div class="nav-pill-bar">
+      <button class="nav-orb" type="button" onclick="toggleTheme()" aria-label="Theme">
+        <span class="nav-emoji">&#9681;</span>
+        <span class="nav-orb-label" id="themeBtn">Dark</span>
+      </button>
+      <a class="nav-orb" href="dashboard.html" aria-label="Dashboard">
+        <span class="nav-emoji">&#128202;</span>
+        <span class="nav-orb-label">Dashboard</span>
+      </a>
+      <a class="nav-orb" href="login page.html" aria-label="Logout">
+        <span class="nav-emoji">&#10138;</span>
+        <span class="nav-orb-label">Logout</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <h1>Stress Relief Zone</h1>
+  <div class="sub">Quick tools to calm down: stress check, breathing cycle, positive quotes, and a simple bubble pop game.</div>
+
+  <div class="grid">
+    <section>
+      <h2>How stressed are you?</h2>
+      <input type="range" min="1" max="10" id="stressRange" value="1">
+      <div class="score">
+        <div id="stressResult">You're calm 😄</div>
+        <div class="pill" id="stressLevel">0 / 10</div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button type="button" onclick="saveStress()">Save Stress</button>
+        <div class="pill" id="stressSaveMsg" style="display:none;"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Breathing Exercise</h2>
+      <div class="row">
+        <button type="button" onclick="startBreathing()">Start</button>
+        <button type="button" onclick="stopBreathing()">Stop</button>
+      </div>
+      <div id="breathingText"></div>
+    </section>
+
+    <section>
+      <h2>Positive Thought</h2>
+      <div class="row">
+        <button type="button" onclick="showQuote()">Get Quote</button>
+        <button type="button" onclick="clearQuote()">Clear</button>
+      </div>
+      <p id="quoteText"></p>
+    </section>
+
+    <section>
+      <h2>Pop the Bubbles</h2>
+      <div class="row">
+        <button type="button" onclick="startGame()">Start Game</button>
+        <button type="button" onclick="stopGame()">Stop</button>
+      </div>
+      <div class="score">
+        <div class="pill">Click bubbles to relax</div>
+        <div class="pill">Score: <span id="score">0</span></div>
+      </div>
+      <div id="gameArea"></div>
+    </section>
+  </div>
+
+  <footer>© <span id="year"></span> UniFocus</footer>
+</div>
+  <script src="../js/stress.js"></script>
+</body>
+</html>

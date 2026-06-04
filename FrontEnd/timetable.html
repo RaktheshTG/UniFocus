@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Timetable</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/timetable.css">
+</head>
+
+<body>
+  <div class="navbar">
+    <div class="nav-side nav-left">
+      <div class="nav-pill-bar">
+        <a class="nav-orb" href="WebDev.html" aria-label="Home">
+          <span class="nav-emoji">&#127968;</span>
+          <span class="nav-orb-label">Home</span>
+        </a>
+        <a class="nav-orb active" href="timetable.html" aria-label="Timetable">
+          <span class="nav-emoji">&#128197;</span>
+          <span class="nav-orb-label">Timetable</span>
+        </a>
+      </div>
+    </div>
+    <div class="nav-side nav-right">
+      <div class="nav-pill-bar">
+        <button class="nav-orb" type="button" onclick="toggleTheme()" aria-label="Theme">
+          <span class="nav-emoji">&#9681;</span>
+          <span class="nav-orb-label" id="themeBtn">Dark</span>
+        </button>
+        <a class="nav-orb" href="dashboard.html" aria-label="Dashboard">
+          <span class="nav-emoji">&#128202;</span>
+          <span class="nav-orb-label">Dashboard</span>
+        </a>
+        <a class="nav-orb" href="login page.html" aria-label="Logout">
+          <span class="nav-emoji">&#10138;</span>
+          <span class="nav-orb-label">Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <h1>Scheduled Timetable</h1>
+    <div class="sub">Click any cell to add/edit a subject. Leave blank to clear it. (Saved to DB per user)</div>
+
+    <div class="panel">
+      <div class="top-controls">
+        <input type="text" id="newSlot" placeholder="New Time Slot (example: 10:00 to 11:00)">
+        <button type="button" onclick="addSlot()">Add Time Slot</button>
+        <button class="ghost" type="button" onclick="clearAll()">Clear All</button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="tt">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Mon</th>
+              <th>Tue</th>
+              <th>Wed</th>
+              <th>Thu</th>
+              <th>Fri</th>
+              <th>Sat</th>
+              <th>Sun</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td class="time">8:00 to 9:00</td>
+              <td class="slot"></td><td class="slot"></td><td class="slot"></td><td class="slot"></td><td class="slot"></td><td class="slot"></td><td class="slot"></td>
+            </tr>
+            <tr>
+              <td class="time">9:00 to 10:00</td>
+              <td class="slot"></td><td class="slot"></td><td class="slot"></td><td class="slot"></td><td class="slot"></td><td class="slot"></td><td class="slot"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="legend">
+        <span class="pill"><span class="dot"></span> Filled slots get a subtle highlight</span>
+        <span class="pill">Tip: Press Enter to add slot</span>
+        <span class="pill">Right-click a time slot or a day cell to change or delete</span>
+      </div>
+    </div>
+
+    <div id="contextMenu" class="context-menu">
+      <button type="button" data-action="rename">Change</button>
+      <button type="button" data-action="delete" class="danger">Delete</button>
+    </div>
+
+    <footer>© <span id="year"></span> UniFocus</footer>
+  </div>
+  <script src="../js/timetable.js"></script>
+</body>
+</html>

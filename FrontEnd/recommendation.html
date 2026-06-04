@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Recommendations • UniFocus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/recommendation.css">
+</head>
+
+<body>
+  <div class="navbar">
+    <div class="nav-side nav-left">
+      <div class="nav-pill-bar">
+        <a class="nav-orb" href="WebDev.html" aria-label="Home">
+          <span class="nav-emoji">&#127968;</span>
+          <span class="nav-orb-label">Home</span>
+        </a>
+        <a class="nav-orb active" href="recommendation.html" aria-label="Recommendations">
+          <span class="nav-emoji">&#128161;</span>
+          <span class="nav-orb-label">Insights</span>
+        </a>
+      </div>
+    </div>
+    <div class="nav-side nav-right">
+      <div class="nav-pill-bar">
+        <button class="nav-orb" type="button" onclick="toggleTheme()" aria-label="Theme">
+          <span class="nav-emoji">&#9681;</span>
+          <span class="nav-orb-label" id="themeBtn">Dark</span>
+        </button>
+        <a class="nav-orb" href="dashboard.html" aria-label="Dashboard">
+          <span class="nav-emoji">&#128202;</span>
+          <span class="nav-orb-label">Dashboard</span>
+        </a>
+        <a class="nav-orb" href="login page.html" aria-label="Logout">
+          <span class="nav-emoji">&#10138;</span>
+          <span class="nav-orb-label">Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="title">
+      <h1>Recommendations</h1>
+      <div class="sub">Personalized insights based on your study patterns, consistency, and drop rate.</div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Study patterns <span class="pill" id="rangePill">last 30 days</span></h2>
+        <div class="list" id="patternList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Deadlines & upcoming notes <span class="pill">next 7 days</span></h2>
+        <div class="list" id="deadlineList"></div>
+      </div>
+    </div>
+
+    <footer>© <span id="year"></span> UniFocus</footer>
+  </div>
+  <script src="../js/recommendation.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>To Do List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/todo.css">
+</head>
+
+<body>
+  <div class="navbar">
+    <div class="nav-side nav-left">
+      <div class="nav-pill-bar">
+        <a class="nav-orb" href="WebDev.html" aria-label="Home">
+          <span class="nav-emoji">&#127968;</span>
+          <span class="nav-orb-label">Home</span>
+        </a>
+        <a class="nav-orb active" href="todo.html" aria-label="To Do">
+          <span class="nav-emoji">&#10003;</span>
+          <span class="nav-orb-label">To-Do</span>
+        </a>
+      </div>
+    </div>
+    <div class="nav-side nav-right">
+      <div class="nav-pill-bar">
+        <button class="nav-orb" type="button" onclick="toggleTheme()" aria-label="Theme">
+          <span class="nav-emoji">&#9681;</span>
+          <span class="nav-orb-label" id="themeBtn">Dark</span>
+        </button>
+        <a class="nav-orb" href="dashboard.html" aria-label="Dashboard">
+          <span class="nav-emoji">&#128202;</span>
+          <span class="nav-orb-label">Dashboard</span>
+        </a>
+        <a class="nav-orb" href="login page.html" aria-label="Logout">
+          <span class="nav-emoji">&#10138;</span>
+          <span class="nav-orb-label">Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <h1>To-Do List</h1>
+    <div class="sub">Add tasks fast, check them off, and watch them slide into accomplished.</div>
+
+    <div class="topbar">
+      <input class="input" id="taskInput" type="text" placeholder="Type a task and hit Enter">
+      <button class="btn" type="button" onclick="addTask()">Add</button>
+      <button class="btn ghost" type="button" onclick="clearDone()">Clear Done</button>
+    </div>
+
+    <div class="bi">
+      <div class="panel pending">
+        <h2>
+          Pending Tasks
+          <span class="count" id="pendingCount">0</span>
+        </h2>
+        <div class="list" id="pending"></div>
+      </div>
+
+      <div class="panel done">
+        <h2>
+          Accomplished Tasks
+          <span class="count" id="doneCount">0</span>
+        </h2>
+        <div class="list" id="done"></div>
+      </div>
+    </div>
+
+    <footer>© <span id="year"></span> UniFocus</footer>
+  </div>
+
+  <div id="todoContextMenu" class="context-menu">
+    <button type="button" data-action="edit">Edit</button>
+    <button type="button" data-action="delete" class="danger">Delete</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="../js/todo.js"></script>
+</body>
+</html>

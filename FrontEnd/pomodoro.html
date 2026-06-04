@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>UniFocus Timer</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/pomodoro.css">
+</head>
+
+<body>
+  <div class="backdrop" id="backdrop"></div>
+  <div class="ambient-layer stars active" id="stars"></div>
+  <div class="ambient-layer rain" id="rain"></div>
+  <div class="ambient-layer embers" id="embers"></div>
+  <div class="ambient-layer mist" id="mist"></div>
+  <div class="ambient-layer fireflies" id="fireflies"></div>
+  <div class="ambient-layer comets" id="comets"></div>
+  <div class="ambient-layer aurora" id="aurora">
+    <span class="aurora-wave wave-a"></span>
+    <span class="aurora-wave wave-b"></span>
+    <span class="aurora-wave wave-c"></span>
+    <span class="aurora-wave wave-d"></span>
+    <span class="aurora-wave wave-e"></span>
+  </div>
+  <div class="ambient-layer lightning" id="lightning"></div>
+  <div class="hearth" id="hearth" aria-hidden="true">
+    <span class="flame flame-a"></span>
+    <span class="flame flame-b"></span>
+    <span class="flame flame-c"></span>
+  </div>
+
+  <div class="focus-mode-shell" id="focusModeShell" aria-hidden="true">
+    <div class="focus-mode-panel">
+      <div class="focus-topbar">
+        <span class="focus-badge">Deep Focus Mode</span>
+        <span class="focus-hint">Move mouse to reveal full workspace</span>
+      </div>
+
+      <div class="focus-timer-wrap">
+        <div class="focus-ridge-ring" id="focusModeRing" aria-hidden="true"></div>
+        <div class="focus-session-name" id="focusModeSessionName">Focus Sprint</div>
+        <div class="focus-time" id="focusModeTime">25:00</div>
+        <div class="focus-label" id="focusModeLabel">FOCUS</div>
+      </div>
+
+      <div class="focus-controls">
+        <button type="button" class="primary-action" onclick="start()">Start</button>
+        <button type="button" onclick="pause()">Pause</button>
+        <button type="button" onclick="reset()">Stop</button>
+      </div>
+
+      <div class="focus-quick-config">
+        <label class="focus-compact-field">
+          <span>Sound</span>
+          <select id="focusModeSoundPreset"></select>
+        </label>
+        <label class="focus-compact-field">
+          <span>Backdrop</span>
+          <select id="focusModeBackground"></select>
+        </label>
+        <label class="focus-compact-field">
+          <span>Ambience</span>
+          <select id="focusModeAmbience"></select>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <div class="nav-side nav-left">
+      <div class="nav-pill-bar">
+        <a class="nav-orb" href="WebDev.html" aria-label="Home">
+          <span class="nav-emoji">🏠</span>
+          <span class="nav-orb-label">Home</span>
+        </a>
+        <a class="nav-orb active" href="pomodoro.html" aria-label="Pomodoro">
+          <span class="nav-emoji">⏱️</span>
+          <span class="nav-orb-label">Pomodoro</span>
+        </a>
+        <button class="nav-orb" type="button" onclick="goDashboard()" aria-label="Back">
+          <span class="nav-emoji">↩️</span>
+          <span class="nav-orb-label">Back</span>
+        </button>
+      </div>
+    </div>
+    <div class="nav-side nav-right">
+      <div class="nav-pill-bar">
+        <button class="nav-orb" id="themeBtn" type="button" onclick="toggleTheme()" aria-label="Theme">
+          <span class="nav-emoji" id="themeGlyph">🌙</span>
+          <span class="nav-orb-label" id="themeHint">Dark</span>
+        </button>
+        <a class="nav-orb" href="dashboard.html" aria-label="Dashboard">
+          <span class="nav-emoji">📊</span>
+          <span class="nav-orb-label">Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <main class="page-shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Deep Work Studio</p>
+        <h1>Pomodoro that feels calm, clean, and a little more alive.</h1>
+        <p class="hero-sub">Tune your session with elegant typography, soft gradients, finish sounds, Spotify lofi presets, and ambient visuals like rain or a warm fireplace.</p>
+      </div>
+      <div class="hero-chips">
+        <span class="info-chip">Focus + break presets</span>
+        <span class="info-chip">Preset timer-end sounds</span>
+        <span class="info-chip">Spotify lofi embeds</span>
+        <span class="info-chip">Rain and fire ambience</span>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="panel timer-panel">
+        <div class="timer-top">
+          <div>
+            <p class="panel-kicker">Current session</p>
+            <h2 id="sessionTitle">Focus Sprint</h2>
+          </div>
+          <span class="status-pill" id="statusPill">Ready</span>
+        </div>
+
+        <div class="timer-wrapper" id="ring">
+          <div class="ring-core">
+            <div class="time" id="time">25:00</div>
+            <div class="label" id="modeLabel">FOCUS</div>
+            <div class="mini-meta" id="timerMeta">Next break: 5 min</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button type="button" class="primary-action" onclick="start()">Start</button>
+          <button type="button" onclick="pause()">Pause</button>
+          <button type="button" onclick="reset()">Reset</button>
+        </div>
+
+        <div class="quick-stats">
+          <div class="mini-card">
+            <span class="mini-label">Sound</span>
+            <strong id="activeSoundLabel">Glass Bell</strong>
+          </div>
+          <div class="mini-card">
+            <span class="mini-label">Backdrop</span>
+            <strong id="activeBackdropLabel">Aurora Drift</strong>
+          </div>
+          <div class="mini-card">
+            <span class="mini-label">Ambience</span>
+            <strong id="activeAmbienceLabel">Stars</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel custom-panel">
+        <div class="section-title-row">
+          <div>
+            <p class="panel-kicker">Customize</p>
+            <h3>Session mood</h3>
+          </div>
+          <button type="button" class="ghost-btn" onclick="applySettings()">Apply</button>
+        </div>
+
+        <div class="settings-grid">
+          <div class="setting-card">
+            <div class="setting-head">
+              <h4>Durations</h4>
+              <p>Choose your rhythm.</p>
+            </div>
+            <div class="field-row two-col">
+              <label class="field">
+                <span>Focus</span>
+                <div class="input-wrap">
+                  <input id="focusMinutes" type="number" inputmode="numeric" min="5" max="180" step="1" value="25">
+                  <em>min</em>
+                </div>
+              </label>
+              <label class="field">
+                <span>Break</span>
+                <div class="input-wrap">
+                  <input id="breakMinutes" type="number" inputmode="numeric" min="1" max="60" step="1" value="5">
+                  <em>min</em>
+                </div>
+              </label>
+            </div>
+            <label class="field">
+              <span>Session title</span>
+              <input id="sessionName" type="text" maxlength="40" placeholder="Focus Sprint">
+            </label>
+            <label class="toggle-row">
+              <input id="autoStartBreak" type="checkbox" checked>
+              <span>Auto-start break when focus ends</span>
+            </label>
+            <label class="toggle-row">
+              <input id="desktopAlerts" type="checkbox">
+              <span>Desktop notification when timer ends</span>
+            </label>
+          </div>
+
+          <div class="setting-card">
+            <div class="setting-head">
+              <h4>Sound</h4>
+              <p>Preset ending sounds for your pomodoro.</p>
+            </div>
+            <label class="field">
+              <span>Sound preset</span>
+              <select id="soundPreset"></select>
+            </label>
+            <label class="field">
+              <span>Volume</span>
+              <input id="soundVolume" type="range" min="0" max="100" value="70">
+            </label>
+            <div class="inline-actions">
+              <button type="button" class="ghost-btn" onclick="previewSound()">Preview sound</button>
+            </div>
+          </div>
+
+          <div class="setting-card">
+            <div class="setting-head">
+              <h4>Backdrop</h4>
+              <p>Pick a clean visual background for deep work.</p>
+            </div>
+            <div class="preset-grid" id="backgroundPresets"></div>
+          </div>
+
+          <div class="setting-card">
+            <div class="setting-head">
+              <h4>Ambience</h4>
+              <p>Animated overlays like rain, stars, and fireplace glow.</p>
+            </div>
+            <div class="preset-grid ambient-grid" id="ambiencePresets"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="panel image-panel">
+      <div class="section-title-row">
+        <div>
+          <p class="panel-kicker">Background Image</p>
+          <h3>Image, glass blur, and dashboard sync</h3>
+        </div>
+      </div>
+
+      <div class="visual-panel pomodoro-visual-panel">
+        <div class="visual-copy visual-copy-card">
+          <div class="stat-label">Pomodoro Background Image</div>
+          <div class="visual-sub">Paste an image URL, keep it readable with glass blur, or sync directly with the Dashboard image.</div>
+        </div>
+        <div class="visual-controls visual-controls-card">
+          <input id="backgroundImageUrl" class="visual-input" type="text" placeholder="Paste image URL">
+          <label class="visual-toggle">
+            <input id="backgroundImageSync" type="checkbox" checked>
+            <span>Sync with Dashboard</span>
+          </label>
+          <label class="visual-toggle">
+            <input id="backgroundBlurEnabled" type="checkbox" checked>
+            <span>Glass blur</span>
+          </label>
+          <label class="visual-range">
+            <span>Blur</span>
+            <input id="backgroundBlurAmount" type="range" min="0" max="18" value="4">
+          </label>
+          <button class="nav-btn visual-btn" type="button" onclick="saveBackgroundImage()">Apply Image</button>
+          <button class="nav-btn visual-btn secondary" type="button" onclick="clearBackgroundImage()">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel spotify-panel">
+      <div class="section-title-row">
+        <div>
+          <p class="panel-kicker">Spotify Focus</p>
+          <h3>Lofi presets and account handoff</h3>
+        </div>
+        <button type="button" class="ghost-btn" onclick="connectSpotify()">Connect Spotify</button>
+      </div>
+
+      <div class="spotify-layout">
+        <div class="spotify-card">
+          <div class="setting-head">
+            <h4>Choose account</h4>
+            <p>Use the logged-in UniFocus email or set another mail for a future Spotify OAuth connection.</p>
+          </div>
+
+          <label class="radio-row">
+            <input type="radio" name="spotifyEmailMode" value="current" checked>
+            <span>Use logged-in mail</span>
+          </label>
+          <div class="account-pill" id="currentEmailDisplay">No login mail found</div>
+
+          <label class="radio-row">
+            <input type="radio" name="spotifyEmailMode" value="new">
+            <span>Use another mail</span>
+          </label>
+          <label class="field">
+            <span>Alternate mail</span>
+            <input id="spotifyAltEmail" type="email" placeholder="your-spotify-mail@example.com" disabled>
+          </label>
+
+          <div class="spotify-note" id="spotifyConnectionStatus">
+            Spotify connection is in ready-state UI mode. Add your Spotify client ID + backend callback later to finish secure account linking.
+          </div>
+        </div>
+
+        <div class="spotify-card">
+          <div class="setting-head">
+            <h4>Default lofi playlists</h4>
+            <p>Quick presets for study sessions. Open one inside Spotify or use the built-in embed.</p>
+          </div>
+
+          <div class="now-playing-card">
+            <span class="mini-label">Now visible here</span>
+            <strong id="spotifyNowPlaying">chill lofi study beats</strong>
+            <span class="spotify-mini-note" id="spotifyNowPlayingMeta">Spotify embed active in this panel</span>
+          </div>
+
+          <div class="pin-playlist-box">
+            <label class="field">
+              <span>Pin your playlist</span>
+              <input id="spotifyCustomPlaylist" type="text" placeholder="Paste a Spotify playlist link or playlist ID">
+            </label>
+            <div class="inline-actions">
+              <button type="button" class="ghost-btn" onclick="pinSpotifyPlaylist()">Pin playlist</button>
+              <button type="button" class="ghost-btn" onclick="openSpotifyPlayer()">Open Spotify player</button>
+            </div>
+          </div>
+
+          <div class="playlist-list" id="playlistButtons"></div>
+          <iframe
+            id="spotifyEmbed"
+            class="spotify-embed"
+            src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS?utm_source=generator"
+            loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            title="Spotify playlist embed"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-top">
+        <div>
+          <div class="modal-title" id="modalTitle"></div>
+          <div class="modal-sub" id="modalSub"></div>
+        </div>
+        <button class="xbtn" type="button" onclick="closeModal()">&#10005;</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="../js/pomodoro.js"></script>
+</body>
+</html>
