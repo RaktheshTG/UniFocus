@@ -15,7 +15,7 @@ const backgroundPresets = [
   { id: "solar-dust", name: "Solar Dust", css: "radial-gradient(circle at 14% 16%, rgba(255,215,128,0.22), transparent 18%), radial-gradient(circle at 72% 24%, rgba(255,119,61,0.16), transparent 22%), radial-gradient(circle at 44% 78%, rgba(255,249,217,0.12), transparent 20%), linear-gradient(140deg, #140912 0%, #3a1728 45%, #7b2a28 100%)" },
   { id: "neon-lagoon", name: "Neon Lagoon", css: "linear-gradient(120deg, rgba(255,255,255,0.04) 0 10%, transparent 10% 24%, rgba(255,255,255,0.03) 24% 30%, transparent 30% 100%), radial-gradient(circle at 16% 20%, rgba(38,244,208,0.22), transparent 22%), radial-gradient(circle at 82% 26%, rgba(44,125,255,0.22), transparent 26%), radial-gradient(circle at 52% 84%, rgba(131,85,255,0.24), transparent 28%), linear-gradient(145deg, #05131d 0%, #0d2940 40%, #1b4769 100%)" },
   { id: "lilac-dawn", name: "Lilac Dawn", css: "radial-gradient(circle at 18% 18%, rgba(255,250,255,0.34), transparent 18%), radial-gradient(circle at 72% 20%, rgba(244,205,255,0.28), transparent 24%), radial-gradient(circle at 48% 70%, rgba(255,205,180,0.18), transparent 28%), linear-gradient(150deg, #271939 0%, #5b4f92 46%, #f2a67e 100%)" },
-  { id: "thread-of-longing", name: "Thread of Longing", css: "linear-gradient(180deg, rgba(214,242,255,0.02), rgba(3,8,24,0.05)), url(\"../assets/yourname2.png\") center 44% / cover no-repeat" }
+  { id: "thread-of-longing", name: "Thread of Longing", css: "linear-gradient(180deg, rgba(214,242,255,0.02), rgba(3,8,24,0.05)), url(\"assets/yourname2.png\") center 44% / cover no-repeat" }
 ];
 
 const ambiencePresets = [
