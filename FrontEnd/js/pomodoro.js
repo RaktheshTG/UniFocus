@@ -1141,14 +1141,7 @@ async function savePomodoroSession(durationMinutes){
   const sessionStart = new Date(sessionEnd.getTime() - durationMinutes * 60000);
 
   try{
-    await fetch(`${(() => {
-      const { protocol, hostname, port, origin } = window.location;
-      if (port === "5050") return origin;
-      if (hostname === "localhost" || hostname === "127.0.0.1") {
-        return `${protocol}//${hostname}:5050`;
-      }
-      return origin;
-    })()}/api/pomodoro`, {
+    await fetch(`https://unifocus-backend.onrender.com/api/pomodoro`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

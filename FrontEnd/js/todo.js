@@ -5,14 +5,7 @@
     const pendingCount=document.getElementById("pendingCount");
     const doneCount=document.getElementById("doneCount");
     const toast=document.getElementById("toast");
-    const API_BASE = (() => {
-      const { protocol, hostname, port, origin } = window.location;
-      if (port === "5050") return origin;
-      if (hostname === "localhost" || hostname === "127.0.0.1") {
-        return `${protocol}//${hostname}:5050`;
-      }
-      return origin;
-    })();
+    const API_BASE = "https://unifocus-backend.onrender.com";
 
     function getUserId(){
       const id=localStorage.getItem("user_id");

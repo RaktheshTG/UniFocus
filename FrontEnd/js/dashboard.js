@@ -1,12 +1,5 @@
 ﻿
-const API_BASE = (() => {
-  const { protocol, hostname, port, origin } = window.location;
-  if (port === "5050") return origin;
-  if (hostname === "localhost" || hostname === "127.0.0.1") {
-    return `${protocol}//${hostname}:5050`;
-  }
-  return origin;
-})();
+const API_BASE = "https://unifocus-backend.onrender.com";
 const VISUAL_STORAGE_KEY = "unifocus_visual_preferences_v1";
 const DAILY_STATS_KEY = "unifocus_pomodoro_daily_stats";
 const HISTORY_KEY = "unifocus_pomodoro_history";

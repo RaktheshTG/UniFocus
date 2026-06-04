@@ -1,12 +1,5 @@
 
-    const API_BASE = (() => {
-      const { protocol, hostname, port, origin } = window.location;
-      if (port === "5050") return origin;
-      if (hostname === "localhost" || hostname === "127.0.0.1") {
-        return `${protocol}//${hostname}:5050`;
-      }
-      return origin;
-    })();
+    const API_BASE = "https://unifocus-backend.onrender.com";
     const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
     const tableBody = document.querySelector("#tt tbody");
     const contextMenu = document.getElementById("contextMenu");

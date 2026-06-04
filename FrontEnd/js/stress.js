@@ -1,12 +1,5 @@
 
-    const API_BASE = (() => {
-      const { protocol, hostname, port, origin } = window.location;
-      if (port === "5050") return origin;
-      if (hostname === "localhost" || hostname === "127.0.0.1") {
-        return `${protocol}//${hostname}:5050`;
-      }
-      return origin;
-    })();
+    const API_BASE = "https://unifocus-backend.onrender.com";
 
   const range=document.getElementById("stressRange");
   const result=document.getElementById("stressResult");
