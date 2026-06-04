@@ -11,10 +11,23 @@ app.use(cors());
 app.use(express.json());
 
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "habit_tracker",
+    host: process.env.DB_HOST || "mysql-007-unifocus007.i.aivencloud.com",
+    port: process.env.DB_PORT || 26953,
+    user: process.env.DB_USER || "avnadmin",
+    password: process.env.DB_PASSWORD || "AVNS_01kHJym5w-tcBOUBMxh", // Paste the secret password you unmasked
+    database: process.env.DB_NAME || "habit_tracker", // Updated to match your script's database name!
+    waitForConnections: true,
+    connectionLimit: 10, // Allows up to 10 simultaneous connections
+    queueLimit: 0
+});
+
+db.getConnection((err, connection) => {
+    if (err) {
+        console.error("❌ Database connection failed:", err.message);
+    } else {
+        console.log("🚀 Cloud Database connected successfully via Pool!");
+        connection.release(); // Crucial: returns the connection to the pool
+    }
 });
 
 db.connect((err) => {
@@ -24,6 +37,8 @@ db.connect((err) => {
     console.log("Connected to MySQL Database");
   }
 });
+
+
 
 function query(sql, params = []) {
   return new Promise((resolve, reject) => {
