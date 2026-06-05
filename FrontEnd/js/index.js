@@ -53,8 +53,10 @@ function logout(){
   window.location.href = "login page.html";
 }
 
-function initFogReveal(){
-  const revealItems = document.querySelectorAll(".reveal-fog");
+function initScrollReveal(){
+  const revealItems = document.querySelectorAll(
+    ".reveal-fog, .reveal-fade, .reveal-module, .reveal-module-head"
+  );
   if(!revealItems.length) return;
 
   if(!("IntersectionObserver" in window)){
@@ -69,12 +71,13 @@ function initFogReveal(){
       observer.unobserve(entry.target);
     });
   }, {
-    threshold:0.2,
-    rootMargin:"0px 0px -8% 0px"
+    threshold:0.04,
+    rootMargin:"0px 0px 8% 0px"
   });
 
   revealItems.forEach((item, index) => {
-    item.style.transitionDelay = `${Math.min(index * 90, 360)}ms`;
+    const stagger = item.classList.contains("reveal-module") ? index * 120 : index * 70;
+    item.style.transitionDelay = `${stagger}ms`;
     observer.observe(item);
   });
 }
@@ -85,7 +88,7 @@ function initFogReveal(){
   const savedTheme = localStorage.getItem("theme") || "light";
   applyTheme(savedTheme);
   updateAuthUi();
-  initFogReveal();
+  initScrollReveal();
 
   const year = document.getElementById("year");
   if(year) year.textContent = new Date().getFullYear();

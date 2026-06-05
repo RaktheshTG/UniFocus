@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UniFocus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
@@ -12,11 +15,11 @@
       <a class="brand" href="#home">UniFocus</a>
 
       <div class="nav-links">
-        <a href="#home">Home</a>
-        <a href="#features">Features</a>
-        <a href="#modules">Modules</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
+        <a href="#home"><span class="nav-link-face">Home</span></a>
+        <a href="#features"><span class="nav-link-face">Features</span></a>
+        <a href="#modules"><span class="nav-link-face">Modules</span></a>
+        <a href="#about"><span class="nav-link-face">About</span></a>
+        <a href="#contact"><span class="nav-link-face">Contact</span></a>
       </div>
 
       <div class="nav-actions">
@@ -32,11 +35,11 @@
       <div class="hero-copy card hero-card">
         <div class="hero-tag">&#10024; Minimal student workspace</div>
         <h1 class="typing-quote">
-          <span>Every day, it gets</span>
-          <span>a little easier.</span>
-          <span>But you gotta do it</span>
-          <span>every day,</span>
-          <span>that's the hard part.</span>
+          <span><span class="quote-kw quote-kw-every">Every</span> day, it gets</span>
+          <span>a little <span class="quote-kw quote-kw-easier">easier</span>.</span>
+          <span>But you <span class="quote-kw quote-kw-gotta">gotta</span> do it</span>
+          <span><span class="quote-kw quote-kw-every">every</span> day,</span>
+          <span>that's the <span class="quote-kw quote-kw-hard">hard</span> part.</span>
         </h1>
         <p>
           UniFocus is your <span class="kw kw-green">minimal productivity hub</span>: <span class="kw kw-blue">habits</span>,
@@ -72,28 +75,28 @@
 
   <section id="features" class="section-shell">
     <div class="container">
-      <div class="section-head reveal-fog">
+      <div class="section-head reveal-fade">
         <span class="section-tag">&#9889; Features</span>
         <h2 class="section-title">Minimalistic Habit Tracking</h2>
         <p class="section-subtitle">The only right choice to track your goal progress.</p>
       </div>
 
       <div class="grid">
-        <article class="card feature-card reveal-fog">
+        <article class="card feature-card reveal-fade">
           <div class="feature-icon">&#128200;</div>
           <div class="badge badge-progress">Progress</div>
           <h3>Track your progress</h3>
           <p>Get a clear overview of <span class="kw kw-blue">habits</span>, <span class="kw kw-amber">goals</span>, and <span class="kw kw-green">streaks</span> in one clean board.</p>
         </article>
 
-        <article class="card feature-card reveal-fog">
+        <article class="card feature-card reveal-fade">
           <div class="feature-icon">&#128293;</div>
           <div class="badge badge-consistency">Consistency</div>
           <h3>Maintain the streak</h3>
           <p>The more days you <span class="kw kw-pink">chain</span> in a row, the less likely you are to <span class="kw kw-green">quit</span>.</p>
         </article>
 
-        <article class="card feature-card reveal-fog">
+        <article class="card feature-card reveal-fade">
           <div class="feature-icon">&#127919;</div>
           <div class="badge badge-discipline">Discipline</div>
           <h3>Gain control over time</h3>
@@ -105,14 +108,14 @@
 
   <section id="modules" class="section-shell">
     <div class="container">
-      <div class="section-head reveal-fog">
+      <div class="section-head reveal-module-head">
         <span class="section-tag">&#129513; Modules</span>
         <h2 class="section-title">All-in-one Student Toolkit</h2>
         <p class="section-subtitle">Pick a module and lock in with no clutter, just focus.</p>
       </div>
 
       <div class="modules">
-        <div class="card panel reveal-fog">
+        <div class="card panel reveal-module reveal-module-left">
           <h3>Modules included</h3>
           <ul>
             <li><b><span class="kw kw-blue">Daily Habit Tracker</span></b> - streaks and progress overview</li>
@@ -128,7 +131,7 @@
           </div>
         </div>
 
-        <div class="card panel reveal-fog" id="about">
+        <div class="card panel reveal-module reveal-module-right" id="about">
           <h3>Why UniFocus?</h3>
           <ul>
             <li><span class="kw kw-green">Minimal design</span> means fewer distractions</li>
