@@ -1,8 +1,19 @@
 const AUTH_KEYS = ["user_id", "full_name", "email"];
 
+if("scrollRestoration" in history){
+  history.scrollRestoration = "manual";
+}
+
+function forceTopScroll(){
+  window.scrollTo({ top:0, left:0, behavior:"auto" });
+}
+
 function setThemeUi(theme){
   const themeBtn = document.getElementById("themeBtn");
-  if(themeBtn) themeBtn.textContent = theme === "dark" ? "Light" : "Dark";
+  if(themeBtn){
+    themeBtn.textContent = theme === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19";
+    themeBtn.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+  }
 }
 
 function applyTheme(theme){
@@ -42,11 +53,44 @@ function logout(){
   window.location.href = "login page.html";
 }
 
+function initFogReveal(){
+  const revealItems = document.querySelectorAll(".reveal-fog");
+  if(!revealItems.length) return;
+
+  if(!("IntersectionObserver" in window)){
+    revealItems.forEach((item) => item.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if(!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    });
+  }, {
+    threshold:0.2,
+    rootMargin:"0px 0px -8% 0px"
+  });
+
+  revealItems.forEach((item, index) => {
+    item.style.transitionDelay = `${Math.min(index * 90, 360)}ms`;
+    observer.observe(item);
+  });
+}
+
 (function init(){
+  forceTopScroll();
+
   const savedTheme = localStorage.getItem("theme") || "light";
   applyTheme(savedTheme);
   updateAuthUi();
+  initFogReveal();
 
   const year = document.getElementById("year");
   if(year) year.textContent = new Date().getFullYear();
+
+  requestAnimationFrame(forceTopScroll);
+  window.addEventListener("load", forceTopScroll, { once:true });
+  window.addEventListener("pageshow", forceTopScroll);
 })();

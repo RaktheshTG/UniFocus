@@ -20,7 +20,7 @@
       </div>
 
       <div class="nav-actions">
-        <button class="pill" id="themeBtn" type="button" onclick="toggleTheme()">Dark</button>
+        <button class="pill theme-toggle" id="themeBtn" type="button" onclick="toggleTheme()" aria-label="Switch theme">&#127769;</button>
         <a class="pill" id="loginLink" href="login page.html">Login</a>
         <a class="cta" id="signupLink" href="SignUp.html">Sign Up</a>
       </div>
@@ -30,14 +30,18 @@
   <header id="home" class="hero">
     <div class="container hero-grid">
       <div class="hero-copy card hero-card">
-        <div class="hero-tag">Minimal student workspace</div>
-        <h1>
-          Every day, it gets a little easier.<br>
-          But you gotta do it every day, that's the hard part.
+        <div class="hero-tag">&#10024; Minimal student workspace</div>
+        <h1 class="typing-quote">
+          <span>Every day, it gets</span>
+          <span>a little easier.</span>
+          <span>But you gotta do it</span>
+          <span>every day,</span>
+          <span>that's the hard part.</span>
         </h1>
         <p>
-          UniFocus is your minimal productivity hub: habits, timetable, to-do, Pomodoro, and stress relief quotes
-          built to keep you consistent without distractions.
+          UniFocus is your <span class="kw kw-green">minimal productivity hub</span>: <span class="kw kw-blue">habits</span>,
+          <span class="kw kw-pink">timetable</span>, <span class="kw kw-amber">to-do</span>, Pomodoro, and stress relief quotes
+          built to keep you <span class="kw kw-green">consistent</span> without distractions.
         </p>
 
         <div class="hero-actions">
@@ -47,12 +51,12 @@
 
         <div class="hero-stats">
           <div class="stat-chip">
-            <span class="stat-label">Focus tools</span>
-            <strong>Habits, timer, planner</strong>
+            <span class="stat-label">&#129504; Focus tools</span>
+            <strong><span class="kw kw-blue">Habits</span>, timer, planner</strong>
           </div>
           <div class="stat-chip">
-            <span class="stat-label">Landing page</span>
-            <strong>Shared for every visitor</strong>
+            <span class="stat-label">&#128640; Landing page</span>
+            <strong>Shared for every <span class="kw kw-pink">visitor</span></strong>
           </div>
         </div>
       </div>
@@ -68,29 +72,32 @@
 
   <section id="features" class="section-shell">
     <div class="container">
-      <div class="section-head">
-        <span class="section-tag">Features</span>
+      <div class="section-head reveal-fog">
+        <span class="section-tag">&#9889; Features</span>
         <h2 class="section-title">Minimalistic Habit Tracking</h2>
         <p class="section-subtitle">The only right choice to track your goal progress.</p>
       </div>
 
       <div class="grid">
-        <article class="card feature-card">
-          <div class="badge">Progress</div>
+        <article class="card feature-card reveal-fog">
+          <div class="feature-icon">&#128200;</div>
+          <div class="badge badge-progress">Progress</div>
           <h3>Track your progress</h3>
-          <p>Get a clear overview of habits, goals, and streaks in one clean board.</p>
+          <p>Get a clear overview of <span class="kw kw-blue">habits</span>, <span class="kw kw-amber">goals</span>, and <span class="kw kw-green">streaks</span> in one clean board.</p>
         </article>
 
-        <article class="card feature-card">
-          <div class="badge">Consistency</div>
+        <article class="card feature-card reveal-fog">
+          <div class="feature-icon">&#128293;</div>
+          <div class="badge badge-consistency">Consistency</div>
           <h3>Maintain the streak</h3>
-          <p>The more days you chain in a row, the less likely you are to quit.</p>
+          <p>The more days you <span class="kw kw-pink">chain</span> in a row, the less likely you are to <span class="kw kw-green">quit</span>.</p>
         </article>
 
-        <article class="card feature-card">
-          <div class="badge">Discipline</div>
+        <article class="card feature-card reveal-fog">
+          <div class="feature-icon">&#127919;</div>
+          <div class="badge badge-discipline">Discipline</div>
           <h3>Gain control over time</h3>
-          <p>Build discipline by showing up daily so small wins add up fast.</p>
+          <p>Build <span class="kw kw-blue">discipline</span> by showing up daily so <span class="kw kw-amber">small wins</span> add up fast.</p>
         </article>
       </div>
     </div>
@@ -98,21 +105,21 @@
 
   <section id="modules" class="section-shell">
     <div class="container">
-      <div class="section-head">
-        <span class="section-tag">Modules</span>
+      <div class="section-head reveal-fog">
+        <span class="section-tag">&#129513; Modules</span>
         <h2 class="section-title">All-in-one Student Toolkit</h2>
         <p class="section-subtitle">Pick a module and lock in with no clutter, just focus.</p>
       </div>
 
       <div class="modules">
-        <div class="card panel">
+        <div class="card panel reveal-fog">
           <h3>Modules included</h3>
           <ul>
-            <li><b>Daily Habit Tracker</b> - streaks and progress overview</li>
-            <li><b>Study Timetable</b> - plan your week and avoid chaos</li>
-            <li><b>To-Do List</b> - pending to accomplished workflow</li>
-            <li><b>Pomodoro Timer</b> - sleek timer for deep focus</li>
-            <li><b>Stress Management</b> - motivational quotes and calm mode</li>
+            <li><b><span class="kw kw-blue">Daily Habit Tracker</span></b> - streaks and progress overview</li>
+            <li><b><span class="kw kw-pink">Study Timetable</span></b> - plan your week and avoid chaos</li>
+            <li><b><span class="kw kw-amber">To-Do List</span></b> - pending to accomplished workflow</li>
+            <li><b><span class="kw kw-green">Pomodoro Timer</span></b> - sleek timer for deep focus</li>
+            <li><b><span class="kw kw-purple">Stress Management</span></b> - motivational quotes and calm mode</li>
           </ul>
 
           <div class="mini-cta">
@@ -121,13 +128,13 @@
           </div>
         </div>
 
-        <div class="card panel" id="about">
+        <div class="card panel reveal-fog" id="about">
           <h3>Why UniFocus?</h3>
           <ul>
-            <li>Minimal design means fewer distractions</li>
-            <li>Everything students need in one place</li>
-            <li>Simple UI you can explain in viva</li>
-            <li>Easy to extend later with SQL and login</li>
+            <li><span class="kw kw-green">Minimal design</span> means fewer distractions</li>
+            <li>Everything <span class="kw kw-blue">students</span> need in one place</li>
+            <li><span class="kw kw-amber">Simple UI</span> you can explain in viva</li>
+            <li>Easy to extend later with <span class="kw kw-pink">SQL and login</span></li>
           </ul>
         </div>
       </div>
@@ -135,11 +142,11 @@
   </section>
 
   <footer id="contact" class="footer-shell">
-    <div class="container card footer-card">
+    <div class="container card footer-card reveal-fog">
       <div class="footer-grid">
         <div>
           <h4>UniFocus</h4>
-          <p>A minimal student productivity portal: habits, timetable, to-do, Pomodoro, and stress relief.</p>
+          <p>A <span class="kw kw-green">minimal</span> student productivity portal: habits, timetable, to-do, Pomodoro, and <span class="kw kw-purple">stress relief</span>.</p>
         </div>
 
         <div class="footer-links">
