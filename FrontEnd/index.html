@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/page-transition.css">
   <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
@@ -75,9 +77,13 @@
 
   <section id="features" class="section-shell">
     <div class="container">
-      <div class="section-head reveal-fade">
+      <div class="section-head section-head-features">
         <span class="section-tag">&#9889; Features</span>
-        <h2 class="section-title">Minimalistic Habit Tracking</h2>
+        <h2 class="section-title title-animate-type" aria-label="Minimalistic Habit Tracking">
+          <span class="title-chunk">Minimalistic</span>
+          <span class="title-chunk">Habit</span>
+          <span class="title-chunk">Tracking</span>
+        </h2>
         <p class="section-subtitle">The only right choice to track your goal progress.</p>
       </div>
 
@@ -108,9 +114,13 @@
 
   <section id="modules" class="section-shell">
     <div class="container">
-      <div class="section-head reveal-module-head">
+      <div class="section-head section-head-modules">
         <span class="section-tag">&#129513; Modules</span>
-        <h2 class="section-title">All-in-one Student Toolkit</h2>
+        <h2 class="section-title title-animate-flip" aria-label="All-in-one Student Toolkit">
+          <span class="title-flip-word">All-in-one</span>
+          <span class="title-flip-word">Student</span>
+          <span class="title-flip-word">Toolkit</span>
+        </h2>
         <p class="section-subtitle">Pick a module and lock in with no clutter, just focus.</p>
       </div>
 
@@ -174,6 +184,8 @@
     </div>
   </footer>
 
+  <script src="js/navbar.js"></script>
+  <script src="js/page-transition.js"></script>
   <script src="js/index.js"></script>
 </body>
 </html>

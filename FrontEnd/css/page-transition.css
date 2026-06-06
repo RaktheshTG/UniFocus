@@ -1,0 +1,76 @@
+.page-zoom-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  pointer-events:none;
+  background:#0f172a;
+  clip-path:circle(0px at var(--zoom-x) var(--zoom-y));
+  transition:clip-path 0.68s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] .page-zoom-overlay{
+  background:#eef4ff;
+}
+
+.page-zoom-overlay.is-expanding{
+  clip-path:circle(var(--zoom-r) at var(--zoom-x) var(--zoom-y));
+}
+
+html.auth-zoom-enter body{
+  animation:authPageLand 0.82s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html.auth-zoom-enter .navbar{
+  animation:authNavLand 0.7s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html.auth-zoom-enter .wrap{
+  animation:authFormLand 0.88s 0.12s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes authPageLand{
+  from{
+    opacity:0.35;
+    transform:scale(1.14);
+    filter:blur(6px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1);
+    filter:blur(0);
+  }
+}
+
+@keyframes authNavLand{
+  from{
+    opacity:0;
+    transform:translateY(-18px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes authFormLand{
+  from{
+    opacity:0;
+    transform:scale(0.88) translateY(28px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .page-zoom-overlay{
+    display:none;
+  }
+
+  html.auth-zoom-enter body,
+  html.auth-zoom-enter .navbar,
+  html.auth-zoom-enter .wrap{
+    animation:none !important;
+  }
+}

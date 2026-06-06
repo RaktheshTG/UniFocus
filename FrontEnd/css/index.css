@@ -685,7 +685,7 @@ img{
   font-size:2.55rem;
 }
 
-.typing-quote span{
+.typing-quote > span{
   display:block;
   width:max-content;
   max-width:100%;
@@ -695,6 +695,13 @@ img{
   clip-path:inset(0 100% 0 0);
   text-shadow:0 18px 34px rgba(15,23,42,0.14);
   animation:typingClip 1.05s steps(24, end) forwards, caretBlink 0.8s step-end infinite;
+  margin-bottom: 8px;
+}
+
+/* Cursor Persistence Logic */
+.typing-quote.hide-cursors span {
+  border-right-color: transparent !important;
+  transition: border-color 0.5s ease;
 }
 
 .typing-quote span:nth-child(1){
@@ -859,6 +866,109 @@ img{
 .section-head{
   width:min(760px, 100%);
   margin-bottom:20px;
+}
+
+.section-head-features .section-tag,
+.section-head-features .section-subtitle,
+.section-head-modules .section-tag,
+.section-head-modules .section-subtitle{
+  opacity:0;
+  transform:translateY(14px);
+}
+
+.section-head-features.is-title-visible .section-tag,
+.section-head-features.is-title-visible .section-subtitle,
+.section-head-modules.is-title-visible .section-tag,
+.section-head-modules.is-title-visible .section-subtitle{
+  animation:sectionMetaRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.section-head-features.is-title-visible .section-tag{animation-delay:0.05s;}
+.section-head-features.is-title-visible .section-subtitle{animation-delay:2.55s;}
+.section-head-modules.is-title-visible .section-tag{animation-delay:0.05s;}
+.section-head-modules.is-title-visible .section-subtitle{animation-delay:0.95s;}
+
+@keyframes sectionMetaRise{
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.title-animate-type .title-chunk{
+  display:inline-block;
+  overflow:hidden;
+  white-space:nowrap;
+  clip-path:inset(0 100% 0 0);
+  margin-right:0.24em;
+  border-right:2px solid var(--accent-strong);
+}
+
+.section-head-features.is-title-visible .title-animate-type .title-chunk:nth-child(1){
+  animation:
+    titleChunkType 0.82s steps(18, end) 0.18s forwards,
+    titleChunkCaret 0.65s step-end 0.18s 3;
+}
+
+.section-head-features.is-title-visible .title-animate-type .title-chunk:nth-child(2){
+  animation:
+    titleChunkType 0.82s steps(18, end) 0.98s forwards,
+    titleChunkCaret 0.65s step-end 0.98s 3;
+}
+
+.section-head-features.is-title-visible .title-animate-type .title-chunk:nth-child(3){
+  animation:
+    titleChunkType 0.82s steps(18, end) 1.78s forwards,
+    titleChunkCaret 0.65s step-end 1.78s 4,
+    titleChunkCaretOff 0.01s linear 2.65s forwards;
+}
+
+@keyframes titleChunkType{
+  to{clip-path:inset(0 0 0 0);}
+}
+
+@keyframes titleChunkCaret{
+  0%, 100%{border-color:var(--accent-strong);}
+  50%{border-color:transparent;}
+}
+
+@keyframes titleChunkCaretOff{
+  to{border-color:transparent;}
+}
+
+.title-animate-flip .title-flip-word{
+  display:inline-block;
+  opacity:0;
+  margin-right:0.22em;
+  transform:perspective(760px) rotateX(68deg) translateY(26px) scale(0.84);
+  transform-origin:center bottom;
+  filter:blur(8px);
+}
+
+.section-head-modules.is-title-visible .title-animate-flip .title-flip-word{
+  animation:titleWordFlip 0.78s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.section-head-modules.is-title-visible .title-animate-flip .title-flip-word:nth-child(1){animation-delay:0.12s;}
+.section-head-modules.is-title-visible .title-animate-flip .title-flip-word:nth-child(2){animation-delay:0.28s;}
+.section-head-modules.is-title-visible .title-animate-flip .title-flip-word:nth-child(3){animation-delay:0.44s;}
+
+@keyframes titleWordFlip{
+  0%{
+    opacity:0;
+    transform:perspective(760px) rotateX(68deg) translateY(26px) scale(0.84);
+    filter:blur(8px);
+  }
+  62%{
+    opacity:1;
+    transform:perspective(760px) rotateX(-8deg) translateY(-5px) scale(1.05);
+    filter:blur(0);
+  }
+  100%{
+    opacity:1;
+    transform:perspective(760px) rotateX(0) translateY(0) scale(1);
+    filter:blur(0);
+  }
 }
 
 .grid{
@@ -1376,6 +1486,20 @@ img{
     opacity:1;
     filter:none;
     transform:none;
+    animation:none !important;
+  }
+
+  .section-head-features .section-tag,
+  .section-head-features .section-subtitle,
+  .section-head-modules .section-tag,
+  .section-head-modules .section-subtitle,
+  .title-animate-type .title-chunk,
+  .title-animate-flip .title-flip-word{
+    opacity:1;
+    transform:none;
+    filter:none;
+    clip-path:none;
+    border-right:0;
     animation:none !important;
   }
 }

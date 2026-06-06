@@ -1,20 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>Login page</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/page-transition.css">
+  <link rel="stylesheet" href="css/auth-ambient.css">
   <link rel="stylesheet" href="css/login page.css">
 </head>
 
 <body>
+  <div class="auth-ambient" aria-hidden="true">
+    <span class="auth-ambient-orb auth-ambient-orb--violet"></span>
+    <span class="auth-ambient-orb auth-ambient-orb--amber"></span>
+  </div>
 
   <div class="navbar">
-    <a href="index.html" style="font-weight:800; color:inherit; text-decoration:none;">UniFocus</a>
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">UniFocus</a>
 
-    <div class="right">
-      <button class="theme-btn" id="themeBtn" type="button" onclick="toggleTheme()">Dark</button>
-      <a class="nav-link" href="login page.html">Login</a>
-      <a class="nav-link" href="SignUp.html">Sign Up</a>
+      <div class="nav-links">
+        <a href="index.html#home"><span class="nav-link-face">Home</span></a>
+        <a href="index.html#features"><span class="nav-link-face">Features</span></a>
+        <a href="index.html#modules"><span class="nav-link-face">Modules</span></a>
+        <a href="index.html#about"><span class="nav-link-face">About</span></a>
+        <a href="index.html#contact"><span class="nav-link-face">Contact</span></a>
+      </div>
+
+      <div class="nav-actions">
+        <button class="pill theme-toggle" id="themeBtn" type="button" onclick="toggleTheme()" aria-label="Switch theme">&#127769;</button>
+        <a class="pill" id="loginLink" href="login page.html"><span class="nav-link-face">Login</span></a>
+        <a class="cta" id="signupLink" href="SignUp.html">Sign Up</a>
+      </div>
     </div>
   </div>
 
@@ -40,6 +58,9 @@
       </div>
     </form>
   </div>
+
+  <script src="js/navbar.js"></script>
+  <script src="js/page-transition.js"></script>
   <script src="js/login page.js"></script>
 </body>
 </html>

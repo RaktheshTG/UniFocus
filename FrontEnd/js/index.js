@@ -8,26 +8,6 @@ function forceTopScroll(){
   window.scrollTo({ top:0, left:0, behavior:"auto" });
 }
 
-function setThemeUi(theme){
-  const themeBtn = document.getElementById("themeBtn");
-  if(themeBtn){
-    themeBtn.textContent = theme === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19";
-    themeBtn.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
-  }
-}
-
-function applyTheme(theme){
-  document.documentElement.setAttribute("data-theme", theme);
-  setThemeUi(theme);
-}
-
-function toggleTheme(){
-  const current = document.documentElement.getAttribute("data-theme") || "light";
-  const next = current === "dark" ? "light" : "dark";
-  localStorage.setItem("theme", next);
-  applyTheme(next);
-}
-
 function isLoggedIn(){
   return Boolean(localStorage.getItem("user_id"));
 }
@@ -44,7 +24,13 @@ function updateAuthUi(){
 }
 
 function goPrimary(){
-  window.location.href = isLoggedIn() ? "login page.html" : "SignUp.html";
+  const url = isLoggedIn() ? "login page.html" : "SignUp.html";
+  const primaryCta = document.getElementById("primaryCta");
+  if(typeof window.playZoomToPage === "function" && primaryCta){
+    window.playZoomToPage(url, primaryCta);
+    return;
+  }
+  window.location.href = url;
 }
 
 function logout(){
@@ -53,9 +39,32 @@ function logout(){
   window.location.href = "login page.html";
 }
 
+function initSectionTitleAnimations(){
+  const sectionHeads = document.querySelectorAll(".section-head-features, .section-head-modules");
+  if(!sectionHeads.length) return;
+
+  if(!("IntersectionObserver" in window)){
+    sectionHeads.forEach((head) => head.classList.add("is-title-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if(!entry.isIntersecting) return;
+      entry.target.classList.add("is-title-visible");
+      observer.unobserve(entry.target);
+    });
+  }, {
+    threshold:0.35,
+    rootMargin:"0px 0px -5% 0px"
+  });
+
+  sectionHeads.forEach((head) => observer.observe(head));
+}
+
 function initScrollReveal(){
   const revealItems = document.querySelectorAll(
-    ".reveal-fog, .reveal-fade, .reveal-module, .reveal-module-head"
+    ".reveal-fog, .reveal-fade, .reveal-module"
   );
   if(!revealItems.length) return;
 
@@ -76,8 +85,10 @@ function initScrollReveal(){
   });
 
   revealItems.forEach((item, index) => {
-    const stagger = item.classList.contains("reveal-module") ? index * 120 : index * 70;
-    item.style.transitionDelay = `${stagger}ms`;
+    // Only apply stagger to specific module reveals to avoid "fiddling" with feature cards
+    if (item.classList.contains("reveal-module")) {
+      item.style.transitionDelay = `${index * 120}ms`;
+    }
     observer.observe(item);
   });
 }
@@ -85,10 +96,15 @@ function initScrollReveal(){
 (function init(){
   forceTopScroll();
 
-  const savedTheme = localStorage.getItem("theme") || "light";
-  applyTheme(savedTheme);
   updateAuthUi();
+  initSectionTitleAnimations();
   initScrollReveal();
+
+  // Handle Hero Cursor persistence: Wait for typing (4.2s) + 5 seconds then hide
+  setTimeout(() => {
+    const quote = document.querySelector('.typing-quote');
+    if(quote) quote.classList.add('hide-cursors');
+  }, 9200);
 
   const year = document.getElementById("year");
   if(year) year.textContent = new Date().getFullYear();
