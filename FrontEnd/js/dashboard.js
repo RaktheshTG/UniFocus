@@ -252,7 +252,7 @@ function toggleTheme(){
 function setThemeUi(theme){
   const glyph = document.getElementById("themeGlyph");
   const hint = document.getElementById("themeHint");
-  if(glyph) glyph.textContent = theme === "dark" ? "light" : "dark";
+  if(glyph) glyph.textContent = theme === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19";
   if(hint) hint.textContent = theme === "dark" ? "Light" : "Dark";
 }
 
