@@ -57,14 +57,53 @@ body{
   position:relative;
 }
 
-html:not(.auth-zoom-enter) .wrap{
-  animation:popUp 0.8s var(--ease-out-expo) forwards;
-  transform:scale(0.8);
-  opacity:0;
+/* ============================================================
+   ENTRY ANIMATION — single source of truth
+   The page-zoom overlay (page-transition.js) already "reveals"
+   the page with a circle that spreads from the clicked button.
+   That spread IS the entrance. We must NOT run any other entry
+   animation on top of it, otherwise the form appears to render
+   multiple times.
+
+   - On a zoom-in (html.auth-zoom-enter): keep EVERYTHING fully
+     visible and unanimated. The overlay does the reveal.
+   - On a direct visit (no zoom): play one subtle fade-in only.
+   ============================================================ */
+html.auth-zoom-enter body,
+html.auth-zoom-enter .navbar,
+html.auth-zoom-enter .wrap,
+html.auth-zoom-enter form,
+html.auth-zoom-enter form h1,
+html.auth-zoom-enter .field,
+html.auth-zoom-enter .primary,
+html.auth-zoom-enter .links{
+  animation:none !important;
+  animation-delay:0s !important;
+  animation-duration:0s !important;
+  transform:none !important;
+  opacity:1 !important;
+  filter:none !important;
 }
 
-@keyframes popUp{
-  to{transform:scale(1); opacity:1;}
+/* Direct visit: one subtle fade-in for the form contents only. */
+html:not(.auth-zoom-enter) form h1,
+html:not(.auth-zoom-enter) .field,
+html:not(.auth-zoom-enter) .primary,
+html:not(.auth-zoom-enter) .links{
+  animation:fadeInOnly 0.35s var(--ease-out-expo) both;
+}
+
+html:not(.auth-zoom-enter) form h1{margin:0 0 18px; text-align:center; animation-delay:0s;}
+html:not(.auth-zoom-enter) .field:nth-of-type(1){animation-delay:0.05s;}
+html:not(.auth-zoom-enter) .field:nth-of-type(2){animation-delay:0.1s;}
+html:not(.auth-zoom-enter) .field:nth-of-type(3){animation-delay:0.15s;}
+html:not(.auth-zoom-enter) .field:nth-of-type(4){animation-delay:0.2s;}
+html:not(.auth-zoom-enter) .primary{animation-delay:0.25s;}
+html:not(.auth-zoom-enter) .links{animation-delay:0.3s;}
+
+@keyframes fadeInOnly{
+  from{opacity:0;}
+  to{opacity:1;}
 }
 
 .wrap::before{
@@ -99,27 +138,6 @@ form{
   text-align:left;
   position:relative;
   overflow:hidden;
-}
-
-html:not(.auth-zoom-enter) form h1,
-html:not(.auth-zoom-enter) .field,
-html:not(.auth-zoom-enter) .primary,
-html:not(.auth-zoom-enter) .links{
-  opacity:0;
-  transform:translateY(30px);
-  animation:riseUp 0.6s var(--ease-out-expo) forwards;
-}
-
-html:not(.auth-zoom-enter) form h1{margin:0 0 18px; text-align:center; animation-delay:0.4s;}
-html:not(.auth-zoom-enter) .field:nth-child(2){animation-delay:0.5s;}
-html:not(.auth-zoom-enter) .field:nth-child(3){animation-delay:0.6s;}
-html:not(.auth-zoom-enter) .field:nth-child(4){animation-delay:0.7s;}
-html:not(.auth-zoom-enter) .field:nth-child(5){animation-delay:0.8s;}
-html:not(.auth-zoom-enter) .primary{animation-delay:0.9s;}
-html:not(.auth-zoom-enter) .links{animation-delay:1s;}
-
-@keyframes riseUp{
-  to{opacity:1; transform:translateY(0);}
 }
 
 .field{margin-bottom:14px;}
@@ -182,4 +200,10 @@ input{
 @media (prefers-reduced-motion: reduce){
   body{animation:none;}
   .wrap::before{animation:none;}
+  html:not(.auth-zoom-enter) form h1,
+  html:not(.auth-zoom-enter) .field,
+  html:not(.auth-zoom-enter) .primary,
+  html:not(.auth-zoom-enter) .links{
+    animation:none;
+  }
 }

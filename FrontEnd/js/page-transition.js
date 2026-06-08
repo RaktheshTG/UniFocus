@@ -1,5 +1,3 @@
-const ZOOM_ENTER_KEY = "unifocus_auth_zoom";
-
 function playZoomToPage(url, originEl){
   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
     window.location.href = url;
@@ -26,7 +24,6 @@ function playZoomToPage(url, originEl){
   });
 
   window.setTimeout(() => {
-    sessionStorage.setItem(ZOOM_ENTER_KEY, "1");
     window.location.href = url;
   }, 680);
 }
@@ -64,21 +61,8 @@ function bindAuthZoomLinks(){
   }
 }
 
-function initAuthPageEnter(){
-  if(sessionStorage.getItem(ZOOM_ENTER_KEY) !== "1") return;
-  sessionStorage.removeItem(ZOOM_ENTER_KEY);
-  document.documentElement.classList.add("auth-zoom-enter");
-  window.setTimeout(() => {
-    document.documentElement.classList.remove("auth-zoom-enter");
-  }, 900);
-}
-
 if(document.readyState === "loading"){
-  document.addEventListener("DOMContentLoaded", () => {
-    bindAuthZoomLinks();
-    initAuthPageEnter();
-  });
+  document.addEventListener("DOMContentLoaded", bindAuthZoomLinks);
 }else{
   bindAuthZoomLinks();
-  initAuthPageEnter();
 }
