@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/pomodoro.css">
+  <link rel="stylesheet" href="css/app-nav.css">
 </head>
 
 <body>
@@ -72,19 +73,18 @@
   <div class="navbar">
     <div class="nav-side nav-left">
       <div class="nav-pill-bar">
-        <a class="nav-orb" href="index.html" aria-label="Home">
-          <span class="nav-emoji">🏠</span>
-          <span class="nav-orb-label">Home</span>
-        </a>
-        <a class="nav-orb active" href="pomodoro.html" aria-label="Pomodoro">
-          <span class="nav-emoji">⏱️</span>
-          <span class="nav-orb-label">Pomodoro</span>
-        </a>
         <button class="nav-orb" type="button" onclick="goDashboard()" aria-label="Back">
           <span class="nav-emoji">↩️</span>
           <span class="nav-orb-label">Back</span>
         </button>
+        <a class="nav-orb active" href="pomodoro.html" aria-label="Pomodoro">
+          <span class="nav-emoji">⏱️</span>
+          <span class="nav-orb-label">Pomodoro</span>
+        </a>
       </div>
+    </div>
+    <div class="nav-center">
+      <span class="nav-center-title">Pomodoro Timer</span>
     </div>
     <div class="nav-side nav-right">
       <div class="nav-pill-bar">
@@ -92,10 +92,10 @@
           <span class="nav-emoji" id="themeGlyph">🌙</span>
           <span class="nav-orb-label" id="themeHint">Dark</span>
         </button>
-        <a class="nav-orb" href="dashboard.html" aria-label="Dashboard">
-          <span class="nav-emoji">📊</span>
-          <span class="nav-orb-label">Dashboard</span>
-        </a>
+        <button class="nav-orb" type="button" onclick="logout()" aria-label="Logout">
+          <span class="nav-emoji">↗</span>
+          <span class="nav-orb-label">Logout</span>
+        </button>
       </div>
     </div>
   </div>
@@ -358,6 +358,7 @@
     </div>
   </div>
 
+  <script src="js/app-nav.js"></script>
   <script src="js/pomodoro.js"></script>
 </body>
 </html>

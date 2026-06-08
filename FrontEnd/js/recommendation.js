@@ -15,12 +15,19 @@
 
     function goDashboard(){ window.location.href = "dashboard.html"; }
 
+    function syncThemeUi(theme){
+      const glyph=document.getElementById("themeGlyph");
+      const hint=document.getElementById("themeHint");
+      if(glyph) glyph.textContent=theme==="dark"?"\u2600\uFE0F":"\uD83C\uDF19";
+      if(hint) hint.textContent=theme==="dark"?"Light":"Dark";
+    }
+
     function toggleTheme(){
       const current=document.documentElement.getAttribute("data-theme");
       const next=current==="dark"?"light":"dark";
       document.documentElement.setAttribute("data-theme",next);
       localStorage.setItem("theme",next);
-      document.getElementById("themeBtn").textContent=next==="dark"?"Light":"Dark";
+      syncThemeUi(next);
     }
 
     function pad2(n){ return String(n).padStart(2, "0"); }
@@ -284,11 +291,9 @@
     }
 
     (function init(){
-      const saved=localStorage.getItem("theme");
-      if(saved){
-        document.documentElement.setAttribute("data-theme",saved);
-        document.getElementById("themeBtn").textContent=saved==="dark"?"Light":"Dark";
-      }
+      const saved=localStorage.getItem("theme")||"light";
+      document.documentElement.setAttribute("data-theme",saved);
+      syncThemeUi(saved);
       document.getElementById("year").textContent=new Date().getFullYear();
       render();
     })();

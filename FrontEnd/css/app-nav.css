@@ -1,0 +1,34 @@
+/* Shared navbar styles for the post-login app pages.
+   - Adds the .nav-center (with title) and .nav-orb-icon (compact orb)
+     used by the new entity navbar layout.
+   - These rules are intentionally generic so they work on top of
+     each page's own .navbar / .nav-pill-bar / .nav-orb styles. */
+
+.nav-center{
+  flex:1 1 auto;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-width:0;
+  padding:0 12px;
+  pointer-events:none;
+}
+
+.nav-center-title{
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:0.4px;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+  color:inherit;
+}
+
+.nav-orb-icon{
+  width:46px;
+  height:46px;
+  min-height:46px;
+  padding:0;
+}

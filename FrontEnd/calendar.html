@@ -4,36 +4,36 @@
   <title>Calendar • UniFocus</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/calendar.css">
+  <link rel="stylesheet" href="css/app-nav.css">
 </head>
 
 <body>
   <div class="navbar">
     <div class="nav-side nav-left">
       <div class="nav-pill-bar">
-        <a class="nav-orb" href="index.html" aria-label="Home">
-          <span class="nav-emoji">&#127968;</span>
-          <span class="nav-orb-label">Home</span>
-        </a>
+        <button class="nav-orb" type="button" onclick="goDashboard()" aria-label="Back">
+          <span class="nav-emoji">&#10530;</span>
+          <span class="nav-orb-label">Back</span>
+        </button>
         <a class="nav-orb active" href="calendar.html" aria-label="Calendar">
           <span class="nav-emoji">&#128467;</span>
           <span class="nav-orb-label">Calendar</span>
         </a>
       </div>
     </div>
+    <div class="nav-center">
+      <span class="nav-center-title">Calendar</span>
+    </div>
     <div class="nav-side nav-right">
       <div class="nav-pill-bar">
         <button class="nav-orb" type="button" onclick="toggleTheme()" aria-label="Theme">
-          <span class="nav-emoji">&#9681;</span>
-          <span class="nav-orb-label" id="themeBtn">Dark</span>
+          <span class="nav-emoji" id="themeGlyph">&#9728;&#65039;</span>
+          <span class="nav-orb-label" id="themeHint">Dark</span>
         </button>
-        <a class="nav-orb" href="dashboard.html" aria-label="Dashboard">
-          <span class="nav-emoji">&#128202;</span>
-          <span class="nav-orb-label">Dashboard</span>
-        </a>
-        <a class="nav-orb" href="login page.html" aria-label="Logout">
+        <button class="nav-orb" type="button" onclick="logout()" aria-label="Logout">
           <span class="nav-emoji">&#10138;</span>
           <span class="nav-orb-label">Logout</span>
-        </a>
+        </button>
       </div>
     </div>
   </div>
@@ -97,6 +97,7 @@
       <div id="modalBody"></div>
     </div>
   </div>
+  <script src="js/app-nav.js"></script>
   <script src="js/calendar.js"></script>
 </body>
 </html>
