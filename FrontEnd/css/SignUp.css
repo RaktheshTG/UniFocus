@@ -1,6 +1,6 @@
 :root{
   --ease-out-expo:cubic-bezier(0.16, 1, 0.3, 1);
-  --glow-speed:2s;
+  --glow-speed:6s;
   --glow-color:#3b82f6;
   --bg1:#eef4ff;
   --bg2:#f7efe6;
@@ -139,6 +139,8 @@ form{
   position:relative;
   overflow:hidden;
 }
+
+
 
 .field{margin-bottom:14px;}
 

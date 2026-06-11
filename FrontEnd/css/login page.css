@@ -1,6 +1,6 @@
 :root{
   --ease-out-expo:cubic-bezier(0.16, 1, 0.3, 1);
-  --glow-speed:2s;
+  --glow-speed:6s;
   --glow-color:#3b82f6;
   --bg1:#eef4ff;
   --bg2:#f7efe6;
@@ -140,14 +140,7 @@ form{
   overflow:hidden;
 }
 
-form::before{
-  content:"";
-  position:absolute;
-  inset:-40%;
-  background:radial-gradient(circle, rgba(255,255,255,0.35), transparent 60%);
-  opacity:0.35;
-  pointer-events:none;
-}
+
 
 h1{
   color:var(--text);
