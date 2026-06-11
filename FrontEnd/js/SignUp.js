@@ -52,3 +52,11 @@
         console.error(err);
       }
     }
+
+    // Automatically focus the name textbox after a 1-second delay
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        const nameField = document.getElementById("name");
+        if (nameField) nameField.focus();
+      }, 1000);
+    });

@@ -56,4 +56,12 @@
         console.error(err);
       }
     }
+
+    // Automatically focus the email textbox after a 1-second delay
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        const emailField = document.getElementById("email");
+        if (emailField) emailField.focus();
+      }, 1000);
+    });
     
