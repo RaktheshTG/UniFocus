@@ -1,34 +1,63 @@
-function playZoomToPage(url, originEl){
+function playDriftTransition(url, text) {
   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
     window.location.href = url;
     return;
   }
 
-  const rect = originEl.getBoundingClientRect();
-  const x = rect.left + rect.width / 2;
-  const y = rect.top + rect.height / 2;
-  const maxDist = Math.hypot(
-    Math.max(x, window.innerWidth - x),
-    Math.max(y, window.innerHeight - y)
-  );
+  // 1. Create a container for existing content to slide it out independently
+  const container = document.createElement("div");
+  container.className = "page-drift-container";
+  
+  // Move all current body children into the container
+  while (document.body.firstChild) {
+    container.appendChild(document.body.firstChild);
+  }
+  document.body.appendChild(container);
 
+  // 2. Create and slide in the intermediate overlay
   const overlay = document.createElement("div");
-  overlay.className = "page-zoom-overlay";
-  overlay.style.setProperty("--zoom-x", `${x}px`);
-  overlay.style.setProperty("--zoom-y", `${y}px`);
-  overlay.style.setProperty("--zoom-r", `${maxDist + 24}px`);
+  overlay.className = "drift-overlay";
+  overlay.innerHTML = `<div class="drift-text">${text}</div>`;
   document.body.appendChild(overlay);
 
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => overlay.classList.add("is-expanding"));
+    container.classList.add("is-drifting");
+    overlay.classList.add("is-active");
   });
 
+  // 3. Navigate while the overlay is visible to prevent the "blank" gap
   window.setTimeout(() => {
     window.location.href = url;
-  }, 680);
+  }, 750);
 }
 
-window.playZoomToPage = playZoomToPage;
+// Compatibility layer for index.js
+window.playZoomToPage = (url) => {
+  const text = url.toLowerCase().includes("signup") ? "Heading to sign up page" : "Heading to login page";
+  playDriftTransition(url, text);
+};
+
+// Entrance animation on page load for Login/SignUp
+function handleEntryDrift() {
+  const path = window.location.pathname.toLowerCase();
+  const isAuthPage = path.includes("login") || path.includes("signup");
+  
+  if (isAuthPage) {
+    const text = path.includes("signup") ? "Heading to sign up page" : "Heading to login page";
+    
+    // Create the overlay so it's visible immediately on load
+    const overlay = document.createElement("div");
+    overlay.className = "drift-overlay is-active";
+    overlay.innerHTML = `<div class="drift-text">${text}</div>`;
+    document.body.appendChild(overlay);
+
+    // Animate the overlay OUT and the page content IN
+    requestAnimationFrame(() => {
+      overlay.classList.add("is-leaving");
+    document.body.classList.add("page-drift-in");
+    });
+  }
+}
 
 function bindAuthZoomLinks(){
   const loginLink = document.getElementById("loginLink");
@@ -46,7 +75,7 @@ function bindAuthZoomLinks(){
       const href = loginLink.getAttribute("href");
       if(!shouldZoomTo(href)) return;
       event.preventDefault();
-      playZoomToPage(href, loginLink);
+      playDriftTransition(href, "Heading to login page");
     });
   }
 
@@ -56,13 +85,12 @@ function bindAuthZoomLinks(){
       const href = signupLink.getAttribute("href");
       if(!shouldZoomTo(href)) return;
       event.preventDefault();
-      playZoomToPage(href, signupLink);
+      playDriftTransition(href, "Heading to sign up page");
     });
   }
 }
 
-if(document.readyState === "loading"){
-  document.addEventListener("DOMContentLoaded", bindAuthZoomLinks);
-}else{
+document.addEventListener("DOMContentLoaded", () => {
+  handleEntryDrift();
   bindAuthZoomLinks();
-}
+});

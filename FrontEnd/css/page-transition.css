@@ -1,23 +1,67 @@
-.page-zoom-overlay{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  pointer-events:none;
-  background:#0f172a;
-  clip-path:circle(0px at var(--zoom-x) var(--zoom-y));
-  transition:clip-path 0.68s cubic-bezier(0.4, 0, 0.2, 1);
+/* New Drift Transition Styles */
+.drift-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a;
+  color: #fff;
+  transform: translateX(100%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-[data-theme="light"] .page-zoom-overlay{
-  background:#eef4ff;
+[data-theme="light"] .drift-overlay {
+  background: #eef4ff;
+  color: #111827;
 }
 
-.page-zoom-overlay.is-expanding{
-  clip-path:circle(var(--zoom-r) at var(--zoom-x) var(--zoom-y));
+.drift-overlay.is-active {
+  transform: translateX(0);
 }
 
-@media (prefers-reduced-motion: reduce){
-  .page-zoom-overlay{
-    display:none;
+.drift-overlay.is-leaving {
+  transform: translateX(-100%);
+}
+
+.drift-text {
+  font-family: 'Sora', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+  padding: 0 20px;
+}
+
+/* Container for existing content during transition */
+.page-drift-container {
+  transition: transform 0.675s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+  width: 100%;
+}
+
+.page-drift-container.is-drifting {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* Ensure the body is prepared for the incoming drift */
+body.page-drift-in {
+  overflow-x: hidden;
+}
+
+.page-drift-in {
+  animation: driftInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes driftInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
