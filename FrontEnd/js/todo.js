@@ -5,7 +5,7 @@
     const pendingCount=document.getElementById("pendingCount");
     const doneCount=document.getElementById("doneCount");
     const toast=document.getElementById("toast");
-    const API_BASE = "https://unifocus-backend.onrender.com";
+    const API_BASE = "https://unifocus.onrender.com";
 
     function getUserId(){
       const id=localStorage.getItem("user_id");

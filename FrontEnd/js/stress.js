@@ -1,5 +1,5 @@
 
-    const API_BASE = "https://unifocus-backend.onrender.com";
+    const API_BASE = "https://unifocus.onrender.com";
 
   const range=document.getElementById("stressRange");
   const result=document.getElementById("stressResult");

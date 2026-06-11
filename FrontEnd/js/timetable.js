@@ -1,5 +1,5 @@
 
-    const API_BASE = "https://unifocus-backend.onrender.com";
+    const API_BASE = "https://unifocus.onrender.com";
     const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
     const tableBody = document.querySelector("#tt tbody");
     const contextMenu = document.getElementById("contextMenu");
