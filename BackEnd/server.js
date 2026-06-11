@@ -70,6 +70,35 @@ function sendDbError(res, err) {
   res.status(500).json({ error: err.message });
 }
 
+async function ensureSyncTables() {
+  await query(`
+    CREATE TABLE IF NOT EXISTS user_preferences (
+      user_id INT NOT NULL,
+      preference_key VARCHAR(80) NOT NULL,
+      preference_value JSON NOT NULL,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      PRIMARY KEY (user_id, preference_key),
+      CONSTRAINT fk_preferences_user FOREIGN KEY (user_id)
+        REFERENCES users(user_id) ON DELETE CASCADE
+    )
+  `);
+  await query(`
+    CREATE TABLE IF NOT EXISTS calendar_items (
+      item_id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      item_date DATE NOT NULL,
+      item_type ENUM('note', 'task') NOT NULL,
+      item_text VARCHAR(240) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_calendar_user_date (user_id, item_date),
+      CONSTRAINT fk_calendar_user FOREIGN KEY (user_id)
+        REFERENCES users(user_id) ON DELETE CASCADE
+    )
+  `);
+}
+
+ensureSyncTables().catch((err) => console.error("Could not initialize sync tables:", err.message));
+
 app.use(express.static(path.join(__dirname, "../FrontEnd/html")));
 app.use(express.static(path.join(__dirname, "../FrontEnd")));
 
@@ -143,6 +172,122 @@ app.post("/api/auth/login", async (req, res) => {
       full_name: user.full_name,
       email: user.email,
     });
+  } catch (err) {
+    sendDbError(res, err);
+  }
+});
+
+app.get("/api/preferences/:userId/:key", async (req, res) => {
+  try {
+    const userId = asPositiveInt(req.params.userId);
+    const key = String(req.params.key || "").trim();
+    if (!userId || !/^[a-z0-9_-]{1,80}$/i.test(key)) {
+      return res.status(400).json({ message: "Invalid preference request" });
+    }
+
+    const rows = await query(
+      "SELECT preference_value FROM user_preferences WHERE user_id = ? AND preference_key = ? LIMIT 1",
+      [userId, key]
+    );
+    if (!rows.length) return res.json({ exists: false, value: null });
+
+    let value = rows[0].preference_value;
+    if (typeof value === "string") value = JSON.parse(value);
+    res.json({ exists: true, value });
+  } catch (err) {
+    sendDbError(res, err);
+  }
+});
+
+app.put("/api/preferences/:userId/:key", async (req, res) => {
+  try {
+    const userId = asPositiveInt(req.params.userId);
+    const key = String(req.params.key || "").trim();
+    if (!userId || !/^[a-z0-9_-]{1,80}$/i.test(key) || typeof req.body.value === "undefined") {
+      return res.status(400).json({ message: "Invalid preference payload" });
+    }
+    if (!(await ensureUserExists(userId))) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const value = JSON.stringify(req.body.value);
+    if (Buffer.byteLength(value, "utf8") > 65535) {
+      return res.status(413).json({ message: "Preference value is too large" });
+    }
+
+    await query(
+      `INSERT INTO user_preferences (user_id, preference_key, preference_value)
+       VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE preference_value = VALUES(preference_value)`,
+      [userId, key, value]
+    );
+    res.json({ message: "Preferences saved" });
+  } catch (err) {
+    sendDbError(res, err);
+  }
+});
+
+app.get("/api/calendar/:userId", async (req, res) => {
+  try {
+    const userId = asPositiveInt(req.params.userId);
+    if (!userId) return res.status(400).json({ message: "Invalid user_id" });
+    const rows = await query(
+      `SELECT item_id, DATE_FORMAT(item_date, '%Y-%m-%d') AS item_date,
+              item_type, item_text, created_at
+       FROM calendar_items WHERE user_id = ?
+       ORDER BY item_date, created_at, item_id`,
+      [userId]
+    );
+    res.json(rows);
+  } catch (err) {
+    sendDbError(res, err);
+  }
+});
+
+app.post("/api/calendar", async (req, res) => {
+  try {
+    const userId = asPositiveInt(req.body.user_id);
+    const itemDate = String(req.body.item_date || "");
+    const itemType = req.body.item_type === "task" ? "task" : "note";
+    const itemText = String(req.body.item_text || "").trim().slice(0, 240);
+    if (!userId || !isValidDate(itemDate) || !itemText) {
+      return res.status(400).json({ message: "Invalid calendar item" });
+    }
+    const result = await query(
+      "INSERT INTO calendar_items (user_id, item_date, item_type, item_text) VALUES (?, ?, ?, ?)",
+      [userId, itemDate, itemType, itemText]
+    );
+    res.json({ message: "Calendar item saved", item_id: result.insertId });
+  } catch (err) {
+    sendDbError(res, err);
+  }
+});
+
+app.delete("/api/calendar/:itemId", async (req, res) => {
+  try {
+    const itemId = asPositiveInt(req.params.itemId);
+    const userId = asPositiveInt(req.body.user_id);
+    if (!itemId || !userId) return res.status(400).json({ message: "Invalid calendar item" });
+    const result = await query(
+      "DELETE FROM calendar_items WHERE item_id = ? AND user_id = ?",
+      [itemId, userId]
+    );
+    if (!result.affectedRows) return res.status(404).json({ message: "Calendar item not found" });
+    res.json({ message: "Calendar item deleted" });
+  } catch (err) {
+    sendDbError(res, err);
+  }
+});
+
+app.delete("/api/calendar/day/:userId/:date", async (req, res) => {
+  try {
+    const userId = asPositiveInt(req.params.userId);
+    const itemDate = String(req.params.date || "");
+    if (!userId || !isValidDate(itemDate)) {
+      return res.status(400).json({ message: "Invalid calendar date" });
+    }
+    await query("DELETE FROM calendar_items WHERE user_id = ? AND item_date = ?", [userId, itemDate]);
+    res.json({ message: "Calendar day cleared" });
   } catch (err) {
     sendDbError(res, err);
   }
@@ -537,7 +682,7 @@ app.get("/api/pomodoro/today/:userId", async (req, res) => {
 
     const rows = await query(
       `SELECT
-        COALESCE(SUM(CASE WHEN session_type = 'FOCUS' AND completed = 1 THEN duration_minutes ELSE 0 END), 0) AS minutes_today,
+        COALESCE(SUM(CASE WHEN session_type = 'FOCUS' THEN duration_minutes ELSE 0 END), 0) AS minutes_today,
         COALESCE(SUM(CASE WHEN session_type = 'FOCUS' AND completed = 1 THEN 1 ELSE 0 END), 0) AS sessions_today,
         COALESCE(SUM(CASE WHEN session_type <> 'FOCUS' AND completed = 1 THEN 1 ELSE 0 END), 0) AS breaks_today
       FROM pomodoro_sessions
@@ -546,6 +691,45 @@ app.get("/api/pomodoro/today/:userId", async (req, res) => {
     );
 
     res.json(rows[0] || { minutes_today: 0, sessions_today: 0, breaks_today: 0 });
+  } catch (err) {
+    sendDbError(res, err);
+  }
+});
+
+app.get("/api/pomodoro/stats/:userId", async (req, res) => {
+  try {
+    const userId = asPositiveInt(req.params.userId);
+    if (!userId) return res.status(400).json({ message: "Invalid user_id" });
+    const rows = await query(
+      `SELECT
+         DATE_FORMAT(session_start, '%Y-%m-%d') AS stat_date,
+         SUM(CASE WHEN session_type = 'FOCUS' THEN duration_minutes ELSE 0 END) AS minutes,
+         SUM(CASE WHEN session_type = 'FOCUS' AND completed = 1 THEN 1 ELSE 0 END) AS sessions,
+         SUM(CASE WHEN session_type <> 'FOCUS' AND completed = 1 THEN 1 ELSE 0 END) AS breaks
+       FROM pomodoro_sessions
+       WHERE user_id = ?
+       GROUP BY DATE(session_start)
+       ORDER BY DATE(session_start)`,
+      [userId]
+    );
+    res.json(rows);
+  } catch (err) {
+    sendDbError(res, err);
+  }
+});
+
+app.delete("/api/pomodoro/day/:userId/:date", async (req, res) => {
+  try {
+    const userId = asPositiveInt(req.params.userId);
+    const sessionDate = String(req.params.date || "");
+    if (!userId || !isValidDate(sessionDate)) {
+      return res.status(400).json({ message: "Invalid Pomodoro date" });
+    }
+    await query(
+      "DELETE FROM pomodoro_sessions WHERE user_id = ? AND DATE(session_start) = ?",
+      [userId, sessionDate]
+    );
+    res.json({ message: "Pomodoro day cleared" });
   } catch (err) {
     sendDbError(res, err);
   }

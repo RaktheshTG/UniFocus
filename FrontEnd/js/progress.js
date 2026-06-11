@@ -233,9 +233,19 @@
       });
     }
 
-    function clearToday(){
+    async function clearToday(){
       if(!confirm("Clear today's progress history and stats?")) return;
       const t = todayKey();
+      const userId = getUserId();
+      if(userId){
+        try{
+          await UserSync.request(`/api/pomodoro/day/${userId}/${t}`, { method: "DELETE" });
+        }catch(error){
+          console.error("Could not clear today's server progress", error);
+          alert("Could not clear today's progress. Please try again.");
+          return;
+        }
+      }
       try{
         const rawH = localStorage.getItem(scopedStorageKey(HISTORY_KEY));
         const arr = rawH ? JSON.parse(rawH) : [];
@@ -266,11 +276,12 @@
       syncThemeUi(next);
     }
 
-    (function init(){
+    (async function init(){
       const saved=localStorage.getItem("theme")||"light";
       document.documentElement.setAttribute("data-theme",saved);
       syncThemeUi(saved);
       document.getElementById("year").textContent=new Date().getFullYear();
+      await UserSync.hydratePomodoroStats(DAILY_STATS_KEY);
       refresh();
       renderChart();
     })();

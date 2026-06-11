@@ -49,6 +49,49 @@
       }catch(e){}
     }
 
+    async function syncCalendarFromBackend(){
+      const userId = getUserId();
+      if(!userId) return;
+      const localNotes = loadDayNotes();
+      try{
+        const rows = await UserSync.request(`/api/calendar/${userId}`);
+        if(rows.length === 0 && Object.keys(localNotes).length){
+          for(const [dayKey, rawItems] of Object.entries(localNotes)){
+            for(const item of normalizeDayItems(rawItems)){
+              const saved = await UserSync.request("/api/calendar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  user_id: userId,
+                  item_date: dayKey,
+                  item_type: item.type,
+                  item_text: item.text
+                })
+              });
+              item.id = String(saved.item_id);
+            }
+          }
+          await syncCalendarFromBackend();
+          return;
+        }
+
+        const notes = {};
+        rows.forEach((row) => {
+          const dayKey = String(row.item_date).slice(0, 10);
+          if(!notes[dayKey]) notes[dayKey] = [];
+          notes[dayKey].push({
+            id: String(row.item_id),
+            type: row.item_type,
+            text: row.item_text,
+            createdAt: row.created_at
+          });
+        });
+        saveDayNotes(notes);
+      }catch(error){
+        console.error("Calendar sync failed", error);
+      }
+    }
+
     function minutesToHeatClass(minutes){
       const hrs = minutes / 60;
       if(hrs <= 0) return "heat0";
@@ -260,11 +303,30 @@
       if(e.target === modal) closeModal();
     });
 
-    function upsertItem(dayKey, type, text){
+    async function upsertItem(dayKey, type, text){
       const notes = loadDayNotes();
       const items = normalizeDayItems(notes[dayKey]);
+      const userId = getUserId();
+      let id = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+      if(userId){
+        try{
+          const saved = await UserSync.request("/api/calendar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              user_id: userId,
+              item_date: dayKey,
+              item_type: type,
+              item_text: String(text || "").slice(0, 240)
+            })
+          });
+          id = String(saved.item_id);
+        }catch(error){
+          console.error("Calendar item save failed", error);
+        }
+      }
       items.push({
-        id: `${Date.now()}_${Math.random().toString(16).slice(2)}`,
+        id,
         type,
         text: String(text || "").slice(0, 240),
         createdAt: new Date().toISOString()
@@ -274,7 +336,20 @@
       render();
     }
 
-    function deleteItem(dayKey, id){
+    async function deleteItem(dayKey, id){
+      const userId = getUserId();
+      if(userId && /^\d+$/.test(String(id))){
+        try{
+          await UserSync.request(`/api/calendar/${id}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: userId })
+          });
+        }catch(error){
+          console.error("Calendar item delete failed", error);
+          return;
+        }
+      }
       const notes = loadDayNotes();
       const items = normalizeDayItems(notes[dayKey]).filter(it=>it.id !== id);
       if(items.length) notes[dayKey] = items;
@@ -283,7 +358,16 @@
       render();
     }
 
-    function clearDay(dayKey){
+    async function clearDay(dayKey){
+      const userId = getUserId();
+      if(userId){
+        try{
+          await UserSync.request(`/api/calendar/day/${userId}/${dayKey}`, { method: "DELETE" });
+        }catch(error){
+          console.error("Calendar day clear failed", error);
+          return;
+        }
+      }
       const notes = loadDayNotes();
       delete notes[dayKey];
       saveDayNotes(notes);
@@ -320,10 +404,10 @@
       save.className = "btn primary";
       save.type = "button";
       save.textContent = "Save";
-      save.onclick = ()=>{
+      save.onclick = async ()=>{
         const t = ta.value.trim();
         if(!t){ ta.focus(); return; }
-        upsertItem(dayKey, type, t);
+        await upsertItem(dayKey, type, t);
         closeModal();
       };
 
@@ -375,7 +459,7 @@
           del.className = "btn danger";
           del.type = "button";
           del.textContent = "Delete";
-          del.onclick = ()=>{ deleteItem(dayKey, it.id); openManageModal(dayKey); };
+          del.onclick = async ()=>{ await deleteItem(dayKey, it.id); openManageModal(dayKey); };
           mini.appendChild(del);
 
           row.appendChild(left);
@@ -445,11 +529,15 @@
       syncThemeUi(next);
     }
 
-    (function init(){
+    (async function init(){
       const saved=localStorage.getItem("theme")||"light";
       document.documentElement.setAttribute("data-theme",saved);
       syncThemeUi(saved);
       document.getElementById("year").textContent=new Date().getFullYear();
+      await Promise.all([
+        syncCalendarFromBackend(),
+        UserSync.hydratePomodoroStats(DAILY_STATS_KEY)
+      ]);
       render();
     })();
 

@@ -290,11 +290,15 @@
       }
     }
 
-    (function init(){
+    (async function init(){
       const saved=localStorage.getItem("theme")||"light";
       document.documentElement.setAttribute("data-theme",saved);
       syncThemeUi(saved);
       document.getElementById("year").textContent=new Date().getFullYear();
+      await Promise.all([
+        UserSync.hydratePomodoroStats(DAILY_STATS_KEY),
+        UserSync.hydrateCalendar(CALENDAR_NOTES_KEY)
+      ]);
       render();
     })();
   

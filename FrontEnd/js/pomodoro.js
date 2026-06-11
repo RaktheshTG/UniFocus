@@ -202,10 +202,12 @@ function pluck(ctx, frequency, volume, start){
   tone(ctx, "sine", frequency * 2, volume * 0.4, start, 0.22);
 }
 
-function loadPreferences(){
+async function loadPreferences(){
   try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const saved = raw ? JSON.parse(raw) : {};
+    const legacyRaw = localStorage.getItem(STORAGE_KEY);
+    const legacy = legacyRaw ? JSON.parse(legacyRaw) : {};
+    const cached = UserSync.readLocal(STORAGE_KEY, legacy);
+    const saved = await UserSync.load("pomodoro", STORAGE_KEY, cached);
     preferences = { ...preferences, ...saved };
   }catch(e){
     preferences = { ...preferences };
@@ -235,13 +237,16 @@ function loadPreferences(){
 }
 
 function savePreferences(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+  UserSync.save("pomodoro", STORAGE_KEY, preferences);
 }
 
-function loadVisualPreferences(){
+async function loadVisualPreferences(){
   try{
-    const raw = localStorage.getItem(getVisualStorageKey());
-    const saved = raw ? JSON.parse(raw) : {};
+    const saved = await UserSync.load(
+      "visual",
+      VISUAL_STORAGE_KEY,
+      UserSync.readLocal(VISUAL_STORAGE_KEY, {})
+    );
     visualPreferences.dashboardBackgroundImage = String(saved.dashboardBackgroundImage || saved.backgroundImage || "").trim().slice(0, 500);
     visualPreferences.pomodoroBackgroundImage = String(saved.pomodoroBackgroundImage || "").trim().slice(0, 500);
     visualPreferences.pomodoroSyncWithDashboard = saved.pomodoroSyncWithDashboard !== false;
@@ -261,7 +266,7 @@ function loadVisualPreferences(){
 }
 
 function saveVisualPreferences(){
-  localStorage.setItem(getVisualStorageKey(), JSON.stringify(visualPreferences));
+  UserSync.save("visual", VISUAL_STORAGE_KEY, visualPreferences);
 }
 
 function syncBackgroundImageControls(){
@@ -926,7 +931,7 @@ function tick(){
         sub: "Add a note for this session if you want. Your break can start right after save or skip.",
         onDone: (note) => {
           const remainingToCredit = Math.max(0, completedMins - countedPartialMinutes);
-          savePomodoroSession(completedMins);
+          savePomodoroSession(remainingToCredit);
           bumpLocalPomodoroStatsCompleted(remainingToCredit);
           addHistoryEntry({ kind: "completed", minutes: completedMins, note });
           setMode("BREAK");
@@ -946,6 +951,7 @@ function tick(){
     }else{
       playSelectedSound();
       bumpLocalBreakCompleted(breakMinutesSetting);
+      savePomodoroSession(breakMinutesSetting, "SHORT_BREAK", 1);
       addHistoryEntry({ kind: "break", minutes: breakMinutesSetting, note: "" });
       notifyTimerEnd("Break complete", "Your next focus session is ready.");
       setMode("FOCUS");
@@ -1061,6 +1067,12 @@ function todayKey(){
   return `${y}-${m}-${day}`;
 }
 
+function toSqlDateTime(date){
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ` +
+    `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
 function getScopedStorageKey(baseKey){
   const userId = localStorage.getItem("user_id");
   return userId ? `${baseKey}_user_${userId}` : `${baseKey}_guest`;
@@ -1133,7 +1145,7 @@ function addHistoryEntry(entry){
   }
 }
 
-async function savePomodoroSession(durationMinutes){
+async function savePomodoroSession(durationMinutes, sessionType = "FOCUS", completed = 1){
   const userId = localStorage.getItem("user_id") ? Number(localStorage.getItem("user_id")) : null;
   if(!userId) return;
 
@@ -1146,11 +1158,11 @@ async function savePomodoroSession(durationMinutes){
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         user_id: userId,
-        session_start: sessionStart.toISOString().slice(0, 19).replace("T", " "),
-        session_end: sessionEnd.toISOString().slice(0, 19).replace("T", " "),
+        session_start: toSqlDateTime(sessionStart),
+        session_end: toSqlDateTime(sessionEnd),
         duration_minutes: durationMinutes,
-        session_type: "FOCUS",
-        completed: 1
+        session_type: sessionType,
+        completed
       })
     });
   }catch(err){
@@ -1268,6 +1280,7 @@ function openCountPartialModal(elapsedMin, onAfter){
       sub: `Counting ${formatStudyMinutes(elapsedMin)}. Add a note if you want.`,
       onDone: (note) => {
         bumpLocalPomodoroMinutesOnly(elapsedMin);
+        savePomodoroSession(elapsedMin, "FOCUS", 0);
         countedPartialMinutes = roundStudyMinutes(countedPartialMinutes + elapsedMin);
         addHistoryEntry({ kind: "partial", minutes: elapsedMin, note });
         showToast(`${formatStudyMinutes(elapsedMin)} added to Studied Today`);
@@ -1312,6 +1325,7 @@ function openPausePartialModal(elapsedMin, onPauseOnly){
       sub: `Adding ${formatStudyMinutes(elapsedMin)} to Studied Today. This does not increase session count.`,
       onDone: (note) => {
         bumpLocalPomodoroMinutesOnly(elapsedMin);
+        savePomodoroSession(elapsedMin, "FOCUS", 0);
         countedPartialMinutes = roundStudyMinutes(countedPartialMinutes + elapsedMin);
         addHistoryEntry({ kind: "partial", minutes: elapsedMin, note });
         showToast(`${formatStudyMinutes(elapsedMin)} added and timer paused`);
@@ -1469,7 +1483,7 @@ function bindEvents(){
   });
 }
 
-(function init(){
+(async function init(){
   const savedTheme = localStorage.getItem("theme");
   if(savedTheme){
     document.documentElement.setAttribute("data-theme", savedTheme);
@@ -1478,9 +1492,9 @@ function bindEvents(){
   if(!savedTheme) setThemeUi("light");
 
   populateSoundPresets();
-  loadPreferences();
+  await loadPreferences();
   populateCompactSelectors();
-  loadVisualPreferences();
+  await loadVisualPreferences();
   renderBackgroundPresets();
   renderAmbiencePresets();
   renderSpotifyPlaylists();

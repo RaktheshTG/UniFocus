@@ -174,8 +174,7 @@ function setRange(range){
 
 function getVisualPreferences(){
   try{
-    const raw = localStorage.getItem(visualStorageKey());
-    return raw ? JSON.parse(raw) : {};
+    return UserSync.readLocal(VISUAL_STORAGE_KEY, {});
   }catch(e){
     return {};
   }
@@ -204,7 +203,7 @@ function applyBackgroundImage(){
   backdrop.style.setProperty("--dashboard-blur", `${blurEnabled ? blurAmount : 0}px`);
 }
 
-function saveBackgroundImage(){
+async function saveBackgroundImage(){
   const input = document.getElementById("dashboardBackgroundImage");
   const blurToggle = document.getElementById("dashboardImageBlurEnabled");
   const blurRange = document.getElementById("dashboardImageBlurAmount");
@@ -212,7 +211,7 @@ function saveBackgroundImage(){
   prefs.dashboardBackgroundImage = String(input?.value || "").trim().slice(0, 500);
   prefs.dashboardBlurEnabled = Boolean(blurToggle?.checked);
   prefs.dashboardBlurAmount = Math.max(0, Math.min(18, Number(blurRange?.value || 4)));
-  localStorage.setItem(visualStorageKey(), JSON.stringify(prefs));
+  await UserSync.save("visual", VISUAL_STORAGE_KEY, prefs);
   applyBackgroundImage();
   showToast(prefs.dashboardBackgroundImage ? "Dashboard background image saved" : "Dashboard background image cleared");
 }
@@ -256,7 +255,10 @@ function setThemeUi(theme){
   if(hint) hint.textContent = theme === "dark" ? "Light" : "Dark";
 }
 
-    (function(){
+    (async function(){
+      const localVisual = getVisualPreferences();
+      await UserSync.load("visual", VISUAL_STORAGE_KEY, localVisual);
+      await UserSync.hydratePomodoroStats(DAILY_STATS_KEY);
       const saved=localStorage.getItem("theme");
       if(saved){
         document.documentElement.setAttribute("data-theme",saved);
@@ -270,6 +272,7 @@ function setThemeUi(theme){
       const savedRange = localStorage.getItem("unifocus_dashboard_range") || "weekly";
       applyBackgroundImage();
       setRange(savedRange === "monthly" ? "monthly" : "weekly");
+      loadMinutesToday();
     })();
   
 
