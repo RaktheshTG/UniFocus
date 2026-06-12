@@ -5,6 +5,7 @@ const SPOTIFY_CLIENT_ID = "";
 const PINNED_PLAYLIST_LIMIT = 4;
 const DAILY_STATS_KEY = "unifocus_pomodoro_daily_stats";
 const HISTORY_KEY = "unifocus_pomodoro_history";
+const CUSTOM_LOCAL_BACKGROUND_KEY = "unifocus_pomodoro_local_background_v1";
 
 const backgroundPresets = [
   { id: "aurora", name: "Aurora Drift", css: "linear-gradient(125deg, rgba(255,255,255,0.04) 0 10%, transparent 10% 24%, rgba(255,255,255,0.03) 24% 28%, transparent 28% 100%), radial-gradient(circle at 12% 18%, rgba(124,242,200,0.26), transparent 24%), radial-gradient(circle at 82% 16%, rgba(160,107,255,0.3), transparent 28%), radial-gradient(circle at 52% 84%, rgba(99,179,255,0.22), transparent 30%), linear-gradient(145deg, #05101b 0%, #0f1c2d 40%, #17263b 100%)" },
@@ -15,7 +16,18 @@ const backgroundPresets = [
   { id: "solar-dust", name: "Solar Dust", css: "radial-gradient(circle at 14% 16%, rgba(255,215,128,0.22), transparent 18%), radial-gradient(circle at 72% 24%, rgba(255,119,61,0.16), transparent 22%), radial-gradient(circle at 44% 78%, rgba(255,249,217,0.12), transparent 20%), linear-gradient(140deg, #140912 0%, #3a1728 45%, #7b2a28 100%)" },
   { id: "neon-lagoon", name: "Neon Lagoon", css: "linear-gradient(120deg, rgba(255,255,255,0.04) 0 10%, transparent 10% 24%, rgba(255,255,255,0.03) 24% 30%, transparent 30% 100%), radial-gradient(circle at 16% 20%, rgba(38,244,208,0.22), transparent 22%), radial-gradient(circle at 82% 26%, rgba(44,125,255,0.22), transparent 26%), radial-gradient(circle at 52% 84%, rgba(131,85,255,0.24), transparent 28%), linear-gradient(145deg, #05131d 0%, #0d2940 40%, #1b4769 100%)" },
   { id: "lilac-dawn", name: "Lilac Dawn", css: "radial-gradient(circle at 18% 18%, rgba(255,250,255,0.34), transparent 18%), radial-gradient(circle at 72% 20%, rgba(244,205,255,0.28), transparent 24%), radial-gradient(circle at 48% 70%, rgba(255,205,180,0.18), transparent 28%), linear-gradient(150deg, #271939 0%, #5b4f92 46%, #f2a67e 100%)" },
-  { id: "thread-of-longing", name: "Thread of Longing", css: "linear-gradient(180deg, rgba(214,242,255,0.02), rgba(3,8,24,0.05)), url(\"assets/yourname2.png\") center 44% / cover no-repeat" }
+  { id: "thread-of-longing", name: "Thread of Longing", css: "linear-gradient(180deg, rgba(214,242,255,0.02), rgba(3,8,24,0.05)), url(\"assets/yourname2.png\") center 44% / cover no-repeat" },
+  { id: "custom", name: "Custom +", css: "radial-gradient(circle at 24% 20%, rgba(124,242,200,0.24), transparent 26%), radial-gradient(circle at 78% 70%, rgba(160,107,255,0.3), transparent 30%), linear-gradient(145deg, #091421, #1b2740)", custom: true }
+];
+
+const ringColorPresets = [
+  { id: "mint", name: "Liquid Mint", colors: ["#7cf2c8"] },
+  { id: "ocean", name: "Ocean Blue", colors: ["#62cfff"] },
+  { id: "violet", name: "Soft Violet", colors: ["#b48cff"] },
+  { id: "rose", name: "Rose Quartz", colors: ["#ff8fb8"] },
+  { id: "amber", name: "Warm Amber", colors: ["#ffd074"] },
+  { id: "gradient", name: "Aurora Gradient", colors: ["#6fffd2", "#65c7ff", "#b58cff", "#ff8fc6"], gradient: true },
+  { id: "custom", name: "Custom", colors: ["#7cf2c8"], custom: true }
 ];
 
 const ambiencePresets = [
@@ -43,6 +55,8 @@ let preferences = {
   soundVolume: 70,
   background: "aurora",
   ambience: "stars",
+  ringColor: "mint",
+  customRingColor: "#7cf2c8",
   sessionName: "Focus Sprint",
   desktopAlerts: false,
   autoStartBreak: true,
@@ -126,6 +140,9 @@ const focusModeRingEl = document.getElementById("focusModeRing");
 const focusModeSoundPresetEl = document.getElementById("focusModeSoundPreset");
 const focusModeBackgroundEl = document.getElementById("focusModeBackground");
 const focusModeAmbienceEl = document.getElementById("focusModeAmbience");
+const focusModeRingColorEl = document.getElementById("focusModeRingColor");
+const ringColorPresetEl = document.getElementById("ringColorPresets");
+const ringCustomColorEl = document.getElementById("ringCustomColor");
 const backgroundImageUrlEl = document.getElementById("backgroundImageUrl");
 const backgroundImageSyncEl = document.getElementById("backgroundImageSync");
 const backgroundBlurEnabledEl = document.getElementById("backgroundBlurEnabled");
@@ -220,6 +237,8 @@ async function loadPreferences(){
   preferences.soundPreset = soundPresets[preferences.soundPreset] ? preferences.soundPreset : "glass";
   preferences.background = backgroundPresets.some((item) => item.id === preferences.background) ? preferences.background : "aurora";
   preferences.ambience = ambiencePresets.some((item) => item.id === preferences.ambience) ? preferences.ambience : "stars";
+  preferences.ringColor = ringColorPresets.some((item) => item.id === preferences.ringColor) ? preferences.ringColor : "mint";
+  preferences.customRingColor = /^#[0-9a-f]{6}$/i.test(preferences.customRingColor) ? preferences.customRingColor : "#7cf2c8";
   preferences.sessionName = String(preferences.sessionName || "Focus Sprint").slice(0, 40).trim() || "Focus Sprint";
   preferences.spotifyEmailMode = preferences.spotifyEmailMode === "new" ? "new" : "current";
   preferences.spotifyAltEmail = String(preferences.spotifyAltEmail || "").slice(0, 120);
@@ -270,12 +289,30 @@ function saveVisualPreferences(){
   UserSync.save("visual", VISUAL_STORAGE_KEY, visualPreferences);
 }
 
+function getLocalBackgroundStorageKey(){
+  return UserSync.scopedKey(CUSTOM_LOCAL_BACKGROUND_KEY);
+}
+
+function getLocalBackgroundImage(){
+  return localStorage.getItem(getLocalBackgroundStorageKey()) || "";
+}
+
+function setLocalBackgroundImage(value){
+  const key = getLocalBackgroundStorageKey();
+  if(value) localStorage.setItem(key, value);
+  else localStorage.removeItem(key);
+}
+
 function syncBackgroundImageControls(){
   const syncEnabled = visualPreferences.pomodoroSyncWithDashboard !== false;
-  backgroundImageSyncEl.checked = syncEnabled;
-  backgroundImageUrlEl.value = syncEnabled
+  const selectedImage = syncEnabled
     ? visualPreferences.dashboardBackgroundImage
     : visualPreferences.pomodoroBackgroundImage;
+  backgroundImageSyncEl.checked = syncEnabled;
+  backgroundImageUrlEl.value = selectedImage === "__local__" ? "" : selectedImage;
+  backgroundImageUrlEl.placeholder = selectedImage === "__local__"
+    ? "Local device image selected"
+    : "Paste image URL";
   backgroundImageUrlEl.disabled = syncEnabled;
   backgroundBlurEnabledEl.checked = syncEnabled
     ? visualPreferences.dashboardBlurEnabled !== false
@@ -348,6 +385,14 @@ function populateCompactSelectors(){
     opt.value = preset.id;
     opt.textContent = `${preferences.favoriteAmbiences.includes(preset.id) ? "★ " : ""}${preset.name}`;
     focusModeAmbienceEl.appendChild(opt);
+  });
+
+  focusModeRingColorEl.innerHTML = "";
+  ringColorPresets.forEach((preset) => {
+    const opt = document.createElement("option");
+    opt.value = preset.id;
+    opt.textContent = preset.name;
+    focusModeRingColorEl.appendChild(opt);
   });
 }
 
@@ -429,6 +474,24 @@ function buildAmbiencePreview(id){
 function renderBackgroundPresets(){
   backgroundPresetEl.innerHTML = "";
   sortPresetsWithFavorites(backgroundPresets, "background").forEach((preset) => {
+    if(preset.custom){
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `preset-btn custom-backdrop-btn ${preferences.background === preset.id ? "active" : ""}`;
+      btn.style.background = preset.css;
+      const customImage = visualPreferences.pomodoroBackgroundImage === "__local__"
+        ? getLocalBackgroundImage()
+        : visualPreferences.pomodoroBackgroundImage;
+      if(customImage){
+        btn.style.backgroundImage = `linear-gradient(180deg, rgba(4,9,17,0.04), rgba(4,9,17,0.54)), url("${customImage}")`;
+        btn.style.backgroundSize = "cover";
+        btn.style.backgroundPosition = "center";
+      }
+      btn.innerHTML = '<span class="custom-backdrop-plus">+</span><span class="preset-copy"><strong>Custom</strong><span>Import</span></span>';
+      btn.onclick = openCustomBackdropModal;
+      backgroundPresetEl.appendChild(btn);
+      return;
+    }
     const btn = buildPresetButton({
       preset,
       kind: "background",
@@ -443,6 +506,34 @@ function renderBackgroundPresets(){
       }
     });
     backgroundPresetEl.appendChild(btn);
+  });
+}
+
+function renderRingColorPresets(){
+  ringColorPresetEl.innerHTML = "";
+  ringColorPresets.forEach((preset) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `ring-color-btn ${preferences.ringColor === preset.id ? "active" : ""}`;
+    const swatch = document.createElement("span");
+    swatch.className = "ring-color-swatch";
+    const colors = preset.custom ? [preferences.customRingColor] : preset.colors;
+    swatch.style.background = colors.length > 1
+      ? `linear-gradient(135deg, ${colors.join(", ")})`
+      : colors[0];
+    const name = document.createElement("span");
+    name.textContent = preset.name;
+    btn.appendChild(swatch);
+    btn.appendChild(name);
+    btn.onclick = () => {
+      preferences.ringColor = preset.id;
+      ringCustomColorEl.value = preferences.customRingColor;
+      applyRingAppearance();
+      renderRingColorPresets();
+      focusModeRingColorEl.value = preferences.ringColor;
+      savePreferences();
+    };
+    ringColorPresetEl.appendChild(btn);
   });
 }
 
@@ -557,6 +648,8 @@ function syncFormWithPreferences(){
   focusModeSoundPresetEl.value = preferences.soundPreset;
   focusModeBackgroundEl.value = preferences.background;
   focusModeAmbienceEl.value = preferences.ambience;
+  focusModeRingColorEl.value = preferences.ringColor;
+  ringCustomColorEl.value = preferences.customRingColor;
   syncBackgroundImageControls();
   updateSpotifyEmailDisplay();
 }
@@ -565,9 +658,10 @@ function applyAppearance(){
   const activeBackground = backgroundPresets.find((item) => item.id === preferences.background) || backgroundPresets[0];
   backdropEl.style.background = activeBackground.css;
   backdropEl.setAttribute("data-scene", activeBackground.id);
-  const imageUrl = visualPreferences.pomodoroSyncWithDashboard !== false
+  let imageUrl = visualPreferences.pomodoroSyncWithDashboard !== false
     ? visualPreferences.dashboardBackgroundImage
     : visualPreferences.pomodoroBackgroundImage;
+  if(imageUrl === "__local__") imageUrl = getLocalBackgroundImage();
   const blurEnabled = visualPreferences.pomodoroSyncWithDashboard !== false
     ? visualPreferences.dashboardBlurEnabled !== false
     : visualPreferences.pomodoroBlurEnabled !== false;
@@ -587,6 +681,45 @@ function applyAppearance(){
   sessionTitleEl.textContent = preferences.sessionName;
   focusModeSessionNameEl.textContent = preferences.sessionName;
   focusModeBackgroundEl.value = preferences.background;
+}
+
+function hexToRgba(hex, alpha){
+  const value = String(hex || "").replace("#", "");
+  const normalized = value.length === 3
+    ? value.split("").map((part) => part + part).join("")
+    : value;
+  const number = Number.parseInt(normalized, 16);
+  if(!Number.isFinite(number)) return `rgba(124,242,200,${alpha})`;
+  return `rgba(${(number >> 16) & 255},${(number >> 8) & 255},${number & 255},${alpha})`;
+}
+
+function getGradientBeadColor(index){
+  const stops = ["#6fffd2", "#65c7ff", "#b58cff", "#ff8fc6"];
+  const position = (index / (TOTAL_SEGMENTS - 1)) * (stops.length - 1);
+  const startIndex = Math.floor(position);
+  const endIndex = Math.min(stops.length - 1, startIndex + 1);
+  const mix = position - startIndex;
+  const toRgb = (hex) => [
+    Number.parseInt(hex.slice(1, 3), 16),
+    Number.parseInt(hex.slice(3, 5), 16),
+    Number.parseInt(hex.slice(5, 7), 16)
+  ];
+  const start = toRgb(stops[startIndex]);
+  const end = toRgb(stops[endIndex]);
+  const rgb = start.map((value, channel) => Math.round(value + ((end[channel] - value) * mix)));
+  return `rgb(${rgb.join(",")})`;
+}
+
+function applyRingAppearance(){
+  const preset = ringColorPresets.find((item) => item.id === preferences.ringColor) || ringColorPresets[0];
+  [...segments, ...focusModeSegments].forEach((segment, index) => {
+    const beadIndex = index % TOTAL_SEGMENTS;
+    const color = preset.gradient
+      ? getGradientBeadColor(beadIndex)
+      : preset.custom ? preferences.customRingColor : preset.colors[0];
+    segment.style.setProperty("--bead-color", color);
+    segment.style.setProperty("--bead-glow", preset.gradient ? color : hexToRgba(color, 0.58));
+  });
 }
 
 function clearAmbientIntervals(){
@@ -1229,6 +1362,148 @@ function closeModal(){
   modalBodyEl.innerHTML = "";
 }
 
+function activateCustomBackdrop(imageValue, sourceLabel){
+  visualPreferences.pomodoroSyncWithDashboard = false;
+  visualPreferences.pomodoroBackgroundImage = imageValue;
+  visualPreferences.pomodoroBlurEnabled = true;
+  visualPreferences.pomodoroBlurAmount = 2;
+  preferences.background = "custom";
+  saveVisualPreferences();
+  savePreferences();
+  syncBackgroundImageControls();
+  applyAppearance();
+  populateCompactSelectors();
+  renderBackgroundPresets();
+  closeModal();
+  showToast(`${sourceLabel} backdrop applied`);
+}
+
+function normalizeImageUrl(value){
+  const input = String(value || "").trim();
+  if(!input) return "";
+  try{
+    const url = new URL(input);
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+  }catch(_error){
+    return "";
+  }
+}
+
+function resizeLocalImage(file){
+  return new Promise((resolve, reject) => {
+    if(!file || !file.type.startsWith("image/")){
+      reject(new Error("Choose a valid image file"));
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      const maxDimension = 1600;
+      const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(objectUrl);
+      resolve(canvas.toDataURL("image/jpeg", 0.82));
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("That image could not be opened"));
+    };
+    image.src = objectUrl;
+  });
+}
+
+function openCustomBackdropModal(){
+  const wrap = document.createElement("div");
+  wrap.className = "custom-backdrop-modal";
+
+  const urlField = document.createElement("label");
+  urlField.className = "field2";
+  const urlLabel = document.createElement("span");
+  urlLabel.className = "label2";
+  urlLabel.textContent = "Online image address";
+  const urlInput = document.createElement("input");
+  urlInput.className = "input2";
+  urlInput.type = "url";
+  urlInput.placeholder = "https://example.com/background.jpg";
+  if(visualPreferences.pomodoroBackgroundImage && visualPreferences.pomodoroBackgroundImage !== "__local__"){
+    urlInput.value = visualPreferences.pomodoroBackgroundImage;
+  }
+  urlField.appendChild(urlLabel);
+  urlField.appendChild(urlInput);
+
+  const divider = document.createElement("div");
+  divider.className = "custom-backdrop-divider";
+  divider.textContent = "or";
+
+  const upload = document.createElement("label");
+  upload.className = "custom-upload-zone";
+  const uploadIcon = document.createElement("span");
+  uploadIcon.className = "custom-upload-icon";
+  uploadIcon.textContent = "+";
+  const uploadTitle = document.createElement("strong");
+  uploadTitle.textContent = "Import from this device";
+  const uploadHint = document.createElement("span");
+  uploadHint.textContent = "JPG, PNG, WEBP, or another browser-supported image";
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/*";
+  upload.appendChild(uploadIcon);
+  upload.appendChild(uploadTitle);
+  upload.appendChild(uploadHint);
+  upload.appendChild(fileInput);
+
+  const actions = document.createElement("div");
+  actions.className = "row2";
+  const cancel = document.createElement("button");
+  cancel.type = "button";
+  cancel.className = "btn2";
+  cancel.textContent = "Cancel";
+  cancel.onclick = closeModal;
+  const applyUrl = document.createElement("button");
+  applyUrl.type = "button";
+  applyUrl.className = "btn2 primary";
+  applyUrl.textContent = "Use image address";
+  applyUrl.onclick = () => {
+    const imageUrl = normalizeImageUrl(urlInput.value);
+    if(!imageUrl){
+      showToast("Enter a valid http or https image address");
+      urlInput.focus();
+      return;
+    }
+    setLocalBackgroundImage("");
+    activateCustomBackdrop(imageUrl, "Custom");
+  };
+  actions.appendChild(cancel);
+  actions.appendChild(applyUrl);
+
+  fileInput.onchange = async () => {
+    const file = fileInput.files?.[0];
+    if(!file) return;
+    upload.classList.add("loading");
+    uploadTitle.textContent = "Preparing image...";
+    try{
+      const dataUrl = await resizeLocalImage(file);
+      setLocalBackgroundImage(dataUrl);
+      activateCustomBackdrop("__local__", "Local image");
+    }catch(error){
+      upload.classList.remove("loading");
+      uploadTitle.textContent = "Import from this device";
+      showToast(error.message || "Could not import that image");
+    }
+  };
+
+  wrap.appendChild(urlField);
+  wrap.appendChild(divider);
+  wrap.appendChild(upload);
+  wrap.appendChild(actions);
+  openModal("Custom backdrop", "Paste an online image address or choose an image stored on this device.", wrap);
+  setTimeout(() => urlInput.focus(), 0);
+}
+
 modalEl.addEventListener("click", (e) => {
   if(e.target === modalEl) closeModal();
 });
@@ -1467,6 +1742,11 @@ function bindEvents(){
   });
 
   focusModeBackgroundEl.addEventListener("change", () => {
+    if(focusModeBackgroundEl.value === "custom"){
+      focusModeBackgroundEl.value = preferences.background;
+      openCustomBackdropModal();
+      return;
+    }
     preferences.background = focusModeBackgroundEl.value;
     applyAppearance();
     renderBackgroundPresets();
@@ -1477,6 +1757,22 @@ function bindEvents(){
     preferences.ambience = focusModeAmbienceEl.value;
     applyAmbience();
     renderAmbiencePresets();
+    savePreferences();
+  });
+
+  focusModeRingColorEl.addEventListener("change", () => {
+    preferences.ringColor = focusModeRingColorEl.value;
+    applyRingAppearance();
+    renderRingColorPresets();
+    savePreferences();
+  });
+
+  ringCustomColorEl.addEventListener("input", () => {
+    preferences.ringColor = "custom";
+    preferences.customRingColor = ringCustomColorEl.value;
+    focusModeRingColorEl.value = "custom";
+    applyRingAppearance();
+    renderRingColorPresets();
     savePreferences();
   });
 
@@ -1519,11 +1815,13 @@ function bindEvents(){
   await loadVisualPreferences();
   renderBackgroundPresets();
   renderAmbiencePresets();
+  renderRingColorPresets();
   renderSpotifyPlaylists();
   syncFormWithPreferences();
   applyAppearance();
   applyAmbience();
   applySoundUI();
+  applyRingAppearance();
   bindEvents();
   hardResetToFocus();
 })();

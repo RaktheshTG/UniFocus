@@ -41,6 +41,7 @@
       </div>
 
       <div class="focus-timer-wrap">
+        <div class="focus-clock-glass" aria-hidden="true"></div>
         <div class="focus-ridge-ring" id="focusModeRing" aria-hidden="true"></div>
         <div class="focus-session-name" id="focusModeSessionName">Focus Sprint</div>
         <div class="focus-time" id="focusModeTime">25:00</div>
@@ -65,6 +66,10 @@
         <label class="focus-compact-field">
           <span>Ambience</span>
           <select id="focusModeAmbience"></select>
+        </label>
+        <label class="focus-compact-field">
+          <span>Ring color</span>
+          <select id="focusModeRingColor"></select>
         </label>
       </div>
     </div>
@@ -216,6 +221,18 @@
             <div class="inline-actions">
               <button type="button" class="ghost-btn" onclick="previewSound()">Preview sound</button>
             </div>
+          </div>
+
+          <div class="setting-card ring-color-card">
+            <div class="setting-head">
+              <h4>Ring bead color</h4>
+              <p>Choose one glow or a smooth gradient around all 60 beads.</p>
+            </div>
+            <div class="ring-color-grid" id="ringColorPresets"></div>
+            <label class="ring-custom-color">
+              <span>Custom color</span>
+              <input id="ringCustomColor" type="color" value="#7cf2c8">
+            </label>
           </div>
 
           <div class="setting-card">
