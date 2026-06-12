@@ -59,6 +59,7 @@ let breakMinutesSetting = 5;
 let minutes = 25;
 let seconds = 0;
 let timer = null;
+let timerEndsAt = null;
 let mode = "FOCUS";
 let focusStartRemainingSec = null;
 let breakStartRemainingSec = null;
@@ -809,6 +810,14 @@ function remainingSec(){
   return (minutes * 60) + seconds;
 }
 
+function syncTimerFromClock(){
+  if(!timer || timerEndsAt === null) return remainingSec();
+  const secondsLeft = Math.max(0, Math.ceil((timerEndsAt - Date.now()) / 1000));
+  minutes = Math.floor(secondsLeft / 60);
+  seconds = secondsLeft % 60;
+  return secondsLeft;
+}
+
 function roundStudyMinutes(value){
   return Math.round(Math.max(0, value) * 10) / 10;
 }
@@ -853,10 +862,7 @@ function updateDisplay(){
   timeEl.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   focusModeTimeEl.textContent = timeEl.textContent;
   focusModeLabelEl.textContent = mode;
-  const totalSeconds = mode === "FOCUS" ? focusMinutesSetting * 60 : breakMinutesSetting * 60;
-  const elapsedSeconds = Math.max(0, totalSeconds - remainingSec());
-  const progressRatio = totalSeconds > 0 ? Math.min(1, Math.max(0, elapsedSeconds / totalSeconds)) : 0;
-  const activeCount = Math.round(progressRatio * TOTAL_SEGMENTS);
+  const activeCount = (60 - seconds) % TOTAL_SEGMENTS;
   segments.forEach((seg, index) => {
     seg.classList.toggle("active", index < activeCount);
   });
@@ -887,6 +893,10 @@ function enterFullscreenIfPossible(){
 
 function enterFocusMode(minimal){
   if(!focusModeEnabled) return;
+  if(minimal){
+    syncTimerFromClock();
+    updateDisplay();
+  }
   document.body.classList.toggle("focus-minimal", Boolean(minimal));
   document.body.classList.toggle("focus-normal", !minimal);
   focusModeShellEl.setAttribute("aria-hidden", minimal ? "false" : "true");
@@ -916,61 +926,60 @@ function endFocusModeExperience(){
   focusModeShellEl.setAttribute("aria-hidden", "true");
 }
 
-function tick(){
-  if(minutes === 0 && seconds === 0){
-    clearInterval(timer);
-    timer = null;
+function completeCurrentTimer(){
+  clearInterval(timer);
+  timer = null;
+  timerEndsAt = null;
 
-    if(mode === "FOCUS"){
-      const completedMins = focusMinutesSetting;
-      playSelectedSound();
-      notifyTimerEnd("Focus complete", `${preferences.sessionName} is done. Time for a ${breakMinutesSetting} minute break.`);
-      enterFocusMode(false);
-      openNoteModal({
-        title: "Focus complete",
-        sub: "Add a note for this session if you want. Your break can start right after save or skip.",
-        onDone: (note) => {
-          const remainingToCredit = Math.max(0, completedMins - countedPartialMinutes);
-          savePomodoroSession(remainingToCredit);
-          bumpLocalPomodoroStatsCompleted(remainingToCredit);
-          addHistoryEntry({ kind: "completed", minutes: completedMins, note });
-          setMode("BREAK");
-          minutes = breakMinutesSetting;
-          seconds = 0;
-          breakStartRemainingSec = remainingSec();
-          countedPartialMinutes = 0;
-          updateDisplay();
-          showToast("Break started");
-          if(preferences.autoStartBreak){
-            start();
-          }else{
-            updateStatusPill("Break ready");
-          }
+  if(mode === "FOCUS"){
+    const completedMins = focusMinutesSetting;
+    playSelectedSound();
+    notifyTimerEnd("Focus complete", `${preferences.sessionName} is done. Time for a ${breakMinutesSetting} minute break.`);
+    enterFocusMode(false);
+    openNoteModal({
+      title: "Focus complete",
+      sub: "Add a note for this session if you want. Your break can start right after save or skip.",
+      onDone: (note) => {
+        const remainingToCredit = Math.max(0, completedMins - countedPartialMinutes);
+        savePomodoroSession(remainingToCredit);
+        bumpLocalPomodoroStatsCompleted(remainingToCredit);
+        addHistoryEntry({ kind: "completed", minutes: completedMins, note });
+        setMode("BREAK");
+        minutes = breakMinutesSetting;
+        seconds = 0;
+        breakStartRemainingSec = remainingSec();
+        countedPartialMinutes = 0;
+        updateDisplay();
+        showToast("Break started");
+        if(preferences.autoStartBreak){
+          start();
+        }else{
+          updateStatusPill("Break ready");
         }
-      });
-    }else{
-      playSelectedSound();
-      bumpLocalBreakCompleted(breakMinutesSetting);
-      savePomodoroSession(breakMinutesSetting, "SHORT_BREAK", 1);
-      addHistoryEntry({ kind: "break", minutes: breakMinutesSetting, note: "" });
-      notifyTimerEnd("Break complete", "Your next focus session is ready.");
-      setMode("FOCUS");
-      minutes = focusMinutesSetting;
-      seconds = 0;
-      focusStartRemainingSec = null;
-      updateDisplay();
-      updateStatusPill("Ready");
-      endFocusModeExperience();
-      showToast("Break complete. Ready for focus");
-    }
-    return;
-  }
-
-  if(seconds === 0){
-    minutes--;
-    seconds = 59;
+      }
+    });
   }else{
-    seconds--;
+    playSelectedSound();
+    bumpLocalBreakCompleted(breakMinutesSetting);
+    savePomodoroSession(breakMinutesSetting, "SHORT_BREAK", 1);
+    addHistoryEntry({ kind: "break", minutes: breakMinutesSetting, note: "" });
+    notifyTimerEnd("Break complete", "Your next focus session is ready.");
+    setMode("FOCUS");
+    minutes = focusMinutesSetting;
+    seconds = 0;
+    focusStartRemainingSec = null;
+    updateDisplay();
+    updateStatusPill("Ready");
+    endFocusModeExperience();
+    showToast("Break complete. Ready for focus");
+  }
+}
+
+function tick(){
+  if(syncTimerFromClock() === 0){
+    updateDisplay();
+    completeCurrentTimer();
+    return;
   }
 
   updateDisplay();
@@ -983,18 +992,23 @@ function start(){
   }
   if(mode === "FOCUS" && focusStartRemainingSec === null) focusStartRemainingSec = remainingSec();
   if(mode === "BREAK" && breakStartRemainingSec === null) breakStartRemainingSec = remainingSec();
+  timerEndsAt = Date.now() + (remainingSec() * 1000);
   timer = setInterval(tick, 1000);
   updateStatusPill(mode === "FOCUS" ? "In focus" : "On break");
+  updateDisplay();
   beginFocusModeExperience();
 }
 
 function pause(){
   if(mode === "FOCUS" && timer){
+    syncTimerFromClock();
+    updateDisplay();
     const pendingMinutes = getUncountedPartialMinutes();
     if(pendingMinutes > 0){
       openPausePartialModal(pendingMinutes, () => {
         clearInterval(timer);
         timer = null;
+        timerEndsAt = null;
         updateStatusPill("Paused");
         enterFocusMode(false);
         showToast("Timer paused");
@@ -1002,8 +1016,11 @@ function pause(){
       return;
     }
   }
+  syncTimerFromClock();
   clearInterval(timer);
   timer = null;
+  timerEndsAt = null;
+  updateDisplay();
   updateStatusPill("Paused");
   enterFocusMode(false);
   showToast("Timer paused");
@@ -1012,6 +1029,7 @@ function pause(){
 function hardResetToFocus(){
   clearInterval(timer);
   timer = null;
+  timerEndsAt = null;
   setMode("FOCUS");
   minutes = focusMinutesSetting;
   seconds = 0;
@@ -1480,6 +1498,10 @@ function bindEvents(){
     if(!focusModeEnabled || !timer) return;
     enterFocusMode(false);
     resetFocusModeInactivityTimer();
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if(timer) tick();
   });
 }
 
