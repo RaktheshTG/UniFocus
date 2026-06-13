@@ -5,6 +5,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/dashboard.css">
   <link rel="stylesheet" href="css/app-nav.css">
+  <style>
+/* 1. Register the custom property angle for clean gradient animations */
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* --- TRAPPED RUNNING SNAKE WITH GLOWS & REFLECTIONS --- */
+.card {
+  --border-radius: 20px;
+  --border-width: 6px; 
+
+  /* Colors for the running laser trail */
+  --glow-color-1: hsla(268, 100%, 76%, 1);
+  --glow-color-2: hsla(349, 100%, 74%, 1);
+  --glow-color-3: hsla(192, 100%, 64%, 1);
+
+  position: relative !important;
+  border-radius: var(--border-radius) !important;
+  isolation: isolate;
+  display: flex !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer;
+  height: 140px;
+  
+  /* Restores the master hover lift & deep ambient shadow drop */
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease !important;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.16);
+}
+
+/* Dynamic Snake Track Layer */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+  padding: var(--border-width);
+  box-sizing: border-box;
+
+  background: conic-gradient(
+    from var(--gradient-angle),
+    transparent 0deg,
+    var(--glow-color-1) 35deg,
+    var(--glow-color-2) 70deg,
+    var(--glow-color-3) 105deg,
+    transparent 140deg
+  );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+/* The Solid Card Body Content Container */
+.card-inner {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  /* Connects directly to updated higher contrast colors from dashboard.css */
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  
+  /* Restored: Subtle static rainbow border layout tint */
+  border: 1px solid var(--border);
+
+  margin: var(--border-width);
+  border-radius: calc(var(--border-radius) - var(--border-width));
+  padding: 20px;
+  font-weight: 700;
+  font-size: 17px;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+  
+  /* Restored transitions for internal changes on hover */
+  transition: background 0.35s ease, font-size 0.35s ease, box-shadow 0.35s ease;
+  overflow: hidden;
+}
+
+/* Restored Effect: Slight Reflective Glass Gradient Overlay across top zone */
+.card-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.12) 0%, 
+    rgba(255, 255, 255, 0.03) 40%, 
+    transparent 40.1%
+  );
+  border-radius: inherit;
+}
+
+/* Trigger Hover Interactions */
+.card:hover {
+  transform: translateY(-12px) scale(1.04) !important;
+  /* Restored Effect: Vibrant Neon Outer Drop Glow mapped directly to running themes */
+  box-shadow: 
+    0 24px 48px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(168, 85, 247, 0.25);
+}
+
+/* Restored Effect: Brightens internal background panel beautifully on hover */
+.card:hover .card-inner {
+  font-size: 19px;
+  background: rgba(255, 255, 255, 0.90);
+}
+
+[data-theme="dark"] .card:hover .card-inner {
+  background: rgba(24, 32, 48, 0.90);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Activate the thick snake crawl on hover */
+.card:hover::before {
+  opacity: 1;
+  animation: snake-crawl 1.5s linear infinite;
+}
+
+@keyframes snake-crawl {
+  from {
+    --gradient-angle: 0deg;
+  }
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+  </style>
 </head>
 
 <body>
@@ -42,36 +187,52 @@
   </div>
 
   <div class="stats primary-stats">
-  <div class="stat-card">
-    <div class="stat-label">Studied Today</div>
-    <div class="stat-value"><span id="minutesToday">0</span> <span class="stat-unit">min</span></div>
-  </div>
+    <div class="stat-card">
+      <div class="stat-label">Studied Today</div>
+      <div class="stat-value"><span id="minutesToday">0</span> <span class="stat-unit">min</span></div>
+    </div>
 
-  <div class="stat-card">
-    <div class="stat-label">Focus Sessions</div>
-    <div class="stat-value"><span id="sessionsToday">0</span> <span class="stat-unit">done</span></div>
-  </div>
+    <div class="stat-card">
+      <div class="stat-label">Focus Sessions</div>
+      <div class="stat-value"><span id="sessionsToday">0</span> <span class="stat-unit">done</span></div>
+    </div>
 
-  <div class="stat-card">
-    <div class="stat-label">Streak</div>
-    <div class="stat-value"><span id="streakToday">0</span> <span class="stat-unit">🔥</span></div>
-  </div>
+    <div class="stat-card">
+      <div class="stat-label">Streak</div>
+      <div class="stat-value"><span id="streakToday">0</span> <span class="stat-unit">🔥</span></div>
+    </div>
 
-  <div class="stat-card">
-    <div class="stat-label">Breaks</div>
-    <div class="stat-value"><span id="breaksToday">0</span> <span class="stat-unit">taken</span></div>
+    <div class="stat-card">
+      <div class="stat-label">Breaks</div>
+      <div class="stat-value"><span id="breaksToday">0</span> <span class="stat-unit">taken</span></div>
+    </div>
   </div>
-</div>
 
   <div class="cards">
-    <div class="card" onclick="go('habit.html')">Habit Tracker</div>
-    <div class="card" onclick="go('pomodoro.html')">Pomodoro Timer</div>
-    <div class="card" onclick="go('stress.html')">Stress Relief</div>
-    <div class="card" onclick="go('todo.html')">To-Do List</div>
-    <div class="card" onclick="go('timetable.html')">Timetable</div>
-    <div class="card" onclick="go('progress.html')">Today's Progress</div>
-    <div class="card" onclick="go('calendar.html')">Calendar</div>
-    <div class="card" onclick="go('recommendation.html')">Recommendation</div>
+    <div class="card" onclick="go('habit.html')">
+      <div class="card-inner">Habit Tracker</div>
+    </div>
+    <div class="card" onclick="go('pomodoro.html')">
+      <div class="card-inner">Pomodoro Timer</div>
+    </div>
+    <div class="card" onclick="go('stress.html')">
+      <div class="card-inner">Stress Relief</div>
+    </div>
+    <div class="card" onclick="go('todo.html')">
+      <div class="card-inner">To-Do List</div>
+    </div>
+    <div class="card" onclick="go('timetable.html')">
+      <div class="card-inner">Timetable</div>
+    </div>
+    <div class="card" onclick="go('progress.html')">
+      <div class="card-inner">Today's Progress</div>
+    </div>
+    <div class="card" onclick="go('calendar.html')">
+      <div class="card-inner">Calendar</div>
+    </div>
+    <div class="card" onclick="go('recommendation.html')">
+      <div class="card-inner">Recommendation</div>
+    </div>
   </div>
 
   <div style="width:min(1100px,92%); margin:0 auto 50px;">
@@ -115,8 +276,6 @@
       <button class="nav-btn visual-btn secondary" type="button" onclick="clearBackgroundImage()">Clear</button>
     </div>
   </div>
-
-
 
   <div class="toast" id="dashboardToast"></div>
   <footer>
