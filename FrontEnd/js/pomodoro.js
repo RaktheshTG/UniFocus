@@ -27,6 +27,8 @@ const ringColorPresets = [
   { id: "rose", name: "Rose Quartz", colors: ["#ff8fb8"] },
   { id: "amber", name: "Warm Amber", colors: ["#ffd074"] },
   { id: "gradient", name: "Aurora Gradient", colors: ["#6fffd2", "#65c7ff", "#b58cff", "#ff8fc6"], gradient: true },
+  { id: "sunset-gradient", name: "Sunset Glow", colors: ["#ff5e62", "#ff9966", "#ffcc00"], gradient: true },
+  { id: "cosmic-gradient", name: "Cosmic Neon", colors: ["#00f2fe", "#4facfe", "#b58cff", "#ff8fc6"], gradient: true },
   { id: "custom", name: "Custom", colors: ["#7cf2c8"], custom: true }
 ];
 
@@ -428,6 +430,19 @@ function buildPresetButton({ preset, kind, backgroundStyle, active, onSelect }){
   btn.type = "button";
   btn.className = "preset-btn";
   btn.style.background = backgroundStyle;
+  
+  if(preset.custom){
+    btn.classList.add("custom-backdrop-btn");
+    const customImage = visualPreferences.pomodoroBackgroundImage === "__local__"
+      ? getLocalBackgroundImage()
+      : visualPreferences.pomodoroBackgroundImage;
+    if(customImage){
+      btn.style.backgroundImage = `linear-gradient(180deg, rgba(4,9,17,0.04), rgba(4,9,17,0.54)), url("${customImage}")`;
+      btn.style.backgroundSize = "cover";
+      btn.style.backgroundPosition = "center";
+    }
+  }
+
   if(active) btn.classList.add("active");
   if(isFavoritePreset(kind, preset.id)) btn.classList.add("favorite");
 
@@ -455,6 +470,15 @@ function buildPresetButton({ preset, kind, backgroundStyle, active, onSelect }){
 
   btn.appendChild(favBtn);
   btn.appendChild(copy);
+  
+  if(preset.custom){
+    const plusIcon = document.createElement("span");
+    plusIcon.className = "custom-backdrop-plus-small";
+    plusIcon.innerHTML = "&#9998;"; // pencil edit icon
+    plusIcon.title = "Configure image";
+    btn.appendChild(plusIcon);
+  }
+
   btn.onclick = onSelect;
   return btn;
 }
@@ -474,35 +498,32 @@ function buildAmbiencePreview(id){
 function renderBackgroundPresets(){
   backgroundPresetEl.innerHTML = "";
   sortPresetsWithFavorites(backgroundPresets, "background").forEach((preset) => {
-    if(preset.custom){
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = `preset-btn custom-backdrop-btn ${preferences.background === preset.id ? "active" : ""}`;
-      btn.style.background = preset.css;
-      const customImage = visualPreferences.pomodoroBackgroundImage === "__local__"
-        ? getLocalBackgroundImage()
-        : visualPreferences.pomodoroBackgroundImage;
-      if(customImage){
-        btn.style.backgroundImage = `linear-gradient(180deg, rgba(4,9,17,0.04), rgba(4,9,17,0.54)), url("${customImage}")`;
-        btn.style.backgroundSize = "cover";
-        btn.style.backgroundPosition = "center";
-      }
-      btn.innerHTML = '<span class="custom-backdrop-plus">+</span><span class="preset-copy"><strong>Custom</strong><span>Import</span></span>';
-      btn.onclick = openCustomBackdropModal;
-      backgroundPresetEl.appendChild(btn);
-      return;
-    }
     const btn = buildPresetButton({
       preset,
       kind: "background",
       backgroundStyle: preset.css,
       active: preset.id === preferences.background,
       onSelect: () => {
-      preferences.background = preset.id;
-      applyAppearance();
-      populateCompactSelectors();
-      renderBackgroundPresets();
-      savePreferences();
+        if(preset.custom){
+          const customImage = visualPreferences.pomodoroBackgroundImage === "__local__"
+            ? getLocalBackgroundImage()
+            : visualPreferences.pomodoroBackgroundImage;
+          if(preferences.background === "custom" || !customImage){
+            openCustomBackdropModal();
+          }else{
+            preferences.background = "custom";
+            applyAppearance();
+            populateCompactSelectors();
+            renderBackgroundPresets();
+            savePreferences();
+          }
+        }else{
+          preferences.background = preset.id;
+          applyAppearance();
+          populateCompactSelectors();
+          renderBackgroundPresets();
+          savePreferences();
+        }
       }
     });
     backgroundPresetEl.appendChild(btn);
@@ -656,12 +677,16 @@ function syncFormWithPreferences(){
 
 function applyAppearance(){
   const activeBackground = backgroundPresets.find((item) => item.id === preferences.background) || backgroundPresets[0];
-  backdropEl.style.background = activeBackground.css;
-  backdropEl.setAttribute("data-scene", activeBackground.id);
-  let imageUrl = visualPreferences.pomodoroSyncWithDashboard !== false
-    ? visualPreferences.dashboardBackgroundImage
-    : visualPreferences.pomodoroBackgroundImage;
-  if(imageUrl === "__local__") imageUrl = getLocalBackgroundImage();
+  backdropEl.style.background = "";
+  
+  let imageUrl = "";
+  if(activeBackground.id === "custom"){
+    imageUrl = visualPreferences.pomodoroSyncWithDashboard !== false
+      ? visualPreferences.dashboardBackgroundImage
+      : visualPreferences.pomodoroBackgroundImage;
+    if(imageUrl === "__local__") imageUrl = getLocalBackgroundImage();
+  }
+  
   const blurEnabled = visualPreferences.pomodoroSyncWithDashboard !== false
     ? visualPreferences.dashboardBlurEnabled !== false
     : visualPreferences.pomodoroBlurEnabled !== false;
@@ -672,10 +697,16 @@ function applyAppearance(){
   if(imageUrl){
     backdropEl.classList.add("has-image");
     backdropEl.style.setProperty("--custom-bg-image", `url("${imageUrl}")`);
+    backdropEl.style.backgroundImage = `var(--custom-bg-image), ${activeBackground.css}`;
+    backdropEl.style.backgroundSize = "cover";
+    backdropEl.style.backgroundPosition = "center";
   }else{
     backdropEl.classList.remove("has-image");
     backdropEl.style.removeProperty("--custom-bg-image");
+    backdropEl.style.backgroundImage = "";
+    backdropEl.style.background = activeBackground.css;
   }
+  backdropEl.setAttribute("data-scene", activeBackground.id);
   backdropEl.style.setProperty("--custom-bg-blur", `${blurEnabled ? blurAmount : 0}px`);
   activeBackdropLabelEl.textContent = activeBackground.name;
   sessionTitleEl.textContent = preferences.sessionName;
@@ -693,8 +724,7 @@ function hexToRgba(hex, alpha){
   return `rgba(${(number >> 16) & 255},${(number >> 8) & 255},${number & 255},${alpha})`;
 }
 
-function getGradientBeadColor(index){
-  const stops = ["#6fffd2", "#65c7ff", "#b58cff", "#ff8fc6"];
+function getGradientBeadColor(index, stops = ["#6fffd2", "#65c7ff", "#b58cff", "#ff8fc6"]){
   const position = (index / (TOTAL_SEGMENTS - 1)) * (stops.length - 1);
   const startIndex = Math.floor(position);
   const endIndex = Math.min(stops.length - 1, startIndex + 1);
@@ -715,10 +745,13 @@ function applyRingAppearance(){
   [...segments, ...focusModeSegments].forEach((segment, index) => {
     const beadIndex = index % TOTAL_SEGMENTS;
     const color = preset.gradient
-      ? getGradientBeadColor(beadIndex)
+      ? getGradientBeadColor(beadIndex, preset.colors)
       : preset.custom ? preferences.customRingColor : preset.colors[0];
+    const glowColor = preset.gradient
+      ? color.replace("rgb", "rgba").replace(")", ",0.58)")
+      : hexToRgba(color, 0.58);
     segment.style.setProperty("--bead-color", color);
-    segment.style.setProperty("--bead-glow", preset.gradient ? color : hexToRgba(color, 0.58));
+    segment.style.setProperty("--bead-glow", glowColor);
   });
 }
 
