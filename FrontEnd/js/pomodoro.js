@@ -1020,6 +1020,179 @@ function updateTimerMeta(){
   timerMetaEl.textContent = `Next ${nextLabel}: ${formatHm(nextMinutes)}`;
 }
 
+function initWaterSurface() {
+  const surface = document.querySelector(".water-surface");
+  if (!surface) return;
+ 
+  // Clock glass inner width — SVG needs to be wider than container (2x)
+  // so the scroll loop is seamless
+  const W = 600;   // viewBox width (2× the visible area so loop is seamless)
+  const H = 36;    // viewBox height
+  const amp = 7;   // wave amplitude in px — how tall the peaks are
+  const mid = 14;  // vertical midpoint within the SVG
+ 
+  // Build a sine wave path that spans 2× width for seamless looping
+  function buildWavePath(phaseOffset = 0, amplitude = amp) {
+    const steps = 120;
+    const points = [];
+    for (let i = 0; i <= steps; i++) {
+      const x = (i / steps) * W;
+      const angle = (i / steps) * Math.PI * 4 + phaseOffset; // 2 full cycles across W
+      const y = mid + Math.sin(angle) * amplitude;
+      points.push(`${i === 0 ? "M" : "L"}${x.toFixed(2)},${y.toFixed(2)}`);
+    }
+    // Close down to bottom of SVG to make a filled shape
+    points.push(`L${W},${H} L0,${H} Z`);
+    return points.join(" ");
+  }
+ 
+  const ns = "http://www.w3.org/2000/svg";
+ 
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "none");
+  svg.style.cssText = `
+    position:absolute; top:0; left:-50%; width:200%; height:100%;
+    overflow:visible;
+  `;
+ 
+  // Primary wave — solid white highlight fill
+  const path1 = document.createElementNS(ns, "path");
+  path1.setAttribute("d", buildWavePath(0, amp));
+  path1.setAttribute("fill", "rgba(255,255,255,0.28)");
+ 
+  // Secondary wave — offset phase, slightly different amplitude, more transparent
+  const path2 = document.createElementNS(ns, "path");
+  path2.setAttribute("d", buildWavePath(Math.PI * 0.6, amp * 0.65));
+  path2.setAttribute("fill", "rgba(255,255,255,0.13)");
+ 
+  // Animate: scrolls the SVG left by half its width, then loops
+  // This creates the continuous rightward ocean-wave scroll effect
+  const anim1 = document.createElementNS(ns, "animateTransform");
+  anim1.setAttribute("attributeName", "transform");
+  anim1.setAttribute("type", "translate");
+  anim1.setAttribute("from", "0,0");
+  anim1.setAttribute("to", `-${W / 2},0`);  // scroll left by half = 1 full cycle
+  anim1.setAttribute("dur", "3.2s");
+  anim1.setAttribute("repeatCount", "indefinite");
+ 
+  const anim2 = document.createElementNS(ns, "animateTransform");
+  anim2.setAttribute("attributeName", "transform");
+  anim2.setAttribute("type", "translate");
+  anim2.setAttribute("from", "0,0");
+  anim2.setAttribute("to", `-${W / 2},0`);
+  anim2.setAttribute("dur", "4.8s");   // different speed = wave interference
+  anim2.setAttribute("repeatCount", "indefinite");
+ 
+  path1.appendChild(anim1);
+  path2.appendChild(anim2);
+  svg.appendChild(path2); // secondary behind
+  svg.appendChild(path1); // primary on top
+ 
+  surface.innerHTML = "";
+  surface.appendChild(svg);
+}
+ 
+
+function updateWaterFill() {
+  const waterFill = document.getElementById("waterFill");
+  if (!waterFill) return;
+  const totalSeconds = (mode === "FOCUS" ? focusMinutesSetting : breakMinutesSetting) * 60;
+  const remaining = remainingSec();
+  const pct = totalSeconds > 0
+    ? Math.max(0, Math.min(100, (remaining / totalSeconds) * 100))
+    : 100;
+  waterFill.style.height = `${pct}%`;
+}
+
+let bubbleInterval = null;
+
+function startBubbles() {
+  const waterBubbles = document.getElementById("waterBubbles");
+  if (!waterBubbles) return;
+ 
+  if (bubbleInterval) clearInterval(bubbleInterval);
+ 
+  // Spawn an initial cluster immediately so the tank doesn't look empty
+  for (let i = 0; i < 6; i++) {
+    setTimeout(() => createBubble(waterBubbles), i * 180);
+  }
+ 
+  bubbleInterval = setInterval(() => {
+    if (document.body.classList.contains("focus-minimal") && timer) {
+      // 2 bubbles normally, occasionally 3–4 (like a burst of carbonation)
+      const count = Math.random() < 0.25 ? Math.floor(Math.random() * 2) + 3 : 2;
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => createBubble(waterBubbles), i * 120);
+      }
+    }
+  }, 500);
+}
+
+function createBubble(container) {
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+ 
+  // Size 2–7px, weighted toward small
+  const size = Math.random() < 0.6
+    ? Math.random() * 2.5 + 2    // 2–4.5px small
+    : Math.random() * 3 + 4;     // 4–7px larger
+  bubble.style.width  = `${size}px`;
+  bubble.style.height = `${size}px`;
+ 
+  // Horizontal spawn — anywhere across the clock
+  const x = 8 + Math.random() * 84;
+  bubble.style.left   = `${x}%`;
+  bubble.style.bottom = `${Math.random() * 8}%`; // spawn in bottom 8% only
+ 
+  // How far it rises — 38% to 58% of the container height (mid-clock, soda style)
+  const riseAmount = 38 + Math.random() * 20;
+ 
+  // Sinusoidal horizontal drift — unique per bubble
+  const driftMag = Math.random() * 5 + 2; // 2–7px swing
+  const driftDir = Math.random() > 0.5 ? 1 : -1;
+ 
+  // Duration 3.5–7s — slow enough to look natural
+  const duration = Math.random() * 3.5 + 3.5;
+  const delay    = Math.random() * 0.5;
+ 
+  // Inject a unique keyframe for this bubble so each has its own path
+  const id = `br_${Date.now()}_${Math.floor(Math.random() * 99999)}`;
+  const styleEl = document.createElement("style");
+  styleEl.textContent = `
+    @keyframes ${id} {
+      0%   { transform: translateY(0%)             translateX(0px);                    opacity: 0;    }
+      6%   { opacity: 0.82; }
+      20%  { transform: translateY(-${riseAmount * 0.20}%) translateX(${driftDir * driftMag * 0.5}px);  opacity: 0.85; }
+      38%  { transform: translateY(-${riseAmount * 0.38}%) translateX(${-driftDir * driftMag}px);        opacity: 0.78; }
+      55%  { transform: translateY(-${riseAmount * 0.55}%) translateX(${driftDir * driftMag * 0.7}px);   opacity: 0.65; }
+      72%  { transform: translateY(-${riseAmount * 0.72}%) translateX(${-driftDir * driftMag * 0.4}px);  opacity: 0.45; }
+      88%  { transform: translateY(-${riseAmount * 0.90}%) translateX(${driftDir * driftMag * 0.2}px);   opacity: 0.18; }
+      100% { transform: translateY(-${riseAmount}%)        translateX(0px);                    opacity: 0;    }
+    }
+  `;
+  document.head.appendChild(styleEl);
+ 
+  bubble.style.animation = `${id} ${duration}s ${delay}s ease-in forwards`;
+ 
+  container.appendChild(bubble);
+ 
+  // Clean up both the bubble and its injected keyframe
+  const totalMs = (duration + delay + 0.3) * 1000;
+  setTimeout(() => {
+    bubble.remove();
+    styleEl.remove();
+  }, totalMs);
+}
+
+
+function stopBubbles(){
+  if(bubbleInterval){
+    clearInterval(bubbleInterval);
+    bubbleInterval = null;
+  }
+}
+
 function updateStatusPill(state){
   statusPillEl.textContent = state;
 }
@@ -1036,6 +1209,7 @@ function updateDisplay(){
     seg.classList.toggle("active", index < activeCount);
   });
   updateTimerMeta();
+  updateWaterFill();
 }
 
 function setMode(nextMode){
@@ -1163,6 +1337,7 @@ function start(){
   updateStatusPill(mode === "FOCUS" ? "In focus" : "On break");
   updateDisplay();
   beginFocusModeExperience();
+  startBubbles();
 }
 
 function pause(){
@@ -1177,6 +1352,7 @@ function pause(){
         timerEndsAt = null;
         updateStatusPill("Paused");
         enterFocusMode(false);
+        stopBubbles();
         showToast("Timer paused");
       });
       return;
@@ -1189,6 +1365,7 @@ function pause(){
   updateDisplay();
   updateStatusPill("Paused");
   enterFocusMode(false);
+  stopBubbles();
   showToast("Timer paused");
 }
 
@@ -1205,6 +1382,7 @@ function hardResetToFocus(){
   updateDisplay();
   updateStatusPill("Ready");
   endFocusModeExperience();
+  stopBubbles();
 }
 
 function reset(){

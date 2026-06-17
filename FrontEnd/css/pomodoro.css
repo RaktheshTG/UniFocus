@@ -736,7 +736,7 @@ body.focus-minimal .focus-mode-panel{
   padding:0;
   border:none;
   border-radius:0;
-  background:transparent;
+  background:linear-gradient(145deg, #1a0f0a 0%, #0d0805 50%, #050302 100%);
   box-shadow:none;
   backdrop-filter:none;
 }
@@ -787,6 +787,87 @@ body.focus-minimal .focus-ridge-ring{
 body.focus-minimal .focus-clock-glass{
   width:calc(var(--focus-clock-size) - 82px);
   height:calc(var(--focus-clock-size) - 82px);
+  background:rgba(255,255,255,0.03);
+  backdrop-filter:blur(20px) saturate(1.2);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:50%;
+  box-shadow:
+    0 30px 60px rgba(0,0,0,0.4),
+    inset 0 2px 0 rgba(255,255,255,0.15),
+    inset 0 -1px 0 rgba(255,255,255,0.05),
+    0 0 40px rgba(255,255,255,0.05);
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  overflow:hidden;
+}
+
+.water-fill{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:100%;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(30px) saturate(1.3);
+  transform-origin:bottom;
+  transition:height 0.1s linear;
+  pointer-events:none;
+}
+
+.water-surface{
+  position:absolute;
+  top:0;
+  left:-50%;
+  width:200%;
+  height:20px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+  animation:waveOscillate 3s ease-in-out infinite;
+}
+
+@keyframes waveOscillate{
+  0%, 100%{
+    transform:translateX(0) translateY(0);
+  }
+  25%{
+    transform:translateX(5%) translateY(-2px);
+  }
+  50%{
+    transform:translateX(0) translateY(0);
+  }
+  75%{
+    transform:translateX(-5%) translateY(-2px);
+  }
+}
+
+.water-bubbles{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.bubble{
+  position:absolute;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,0.4);
+  background:rgba(255,255,255,0.02);
+  animation:bubbleRise linear forwards;
+  pointer-events:none;
+}
+
+@keyframes bubbleRise{
+  0%{
+    transform:translateY(100%) scale(1);
+    opacity:0.6;
+  }
+  80%{
+    opacity:0.8;
+  }
+  100%{
+    transform:translateY(-20px) scale(0.8);
+    opacity:0;
+  }
 }
 
 body.focus-minimal .focus-session-name,
@@ -2148,4 +2229,249 @@ input[type="range"]{
     transform-origin:center 140px;
     height:22px;
   }
+}
+
+ /* =============================================================================
+   COMPLETE WATER CLOCK REDESIGN — paste at bottom of pomodoro.css
+   Overrides all previous water + glass rules
+   ============================================================================= */
+
+/* ── 1. PANEL BACKGROUND FIX ─────────────────────────────────────────────── */
+body.focus-minimal .focus-mode-panel {
+  background: transparent !important;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+body.focus-minimal .focus-mode-panel::before,
+body.focus-minimal .focus-mode-panel::after {
+  display: none;
+}
+
+/* ── 2. iOS LIQUID GLASS CLOCK ───────────────────────────────────────────── */
+/* The key: NO blur on the glass itself when there's no water.
+   Blur only comes from the water layer. The glass is just a rim + specular. */
+body.focus-minimal .focus-clock-glass {
+  /* Reset everything from the old rule */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background:
+    /* Top specular highlight — the iOS "light catching on glass" */
+    radial-gradient(
+      ellipse 70% 18% at 50% 4%,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0.18) 40%,
+      transparent 100%
+    ),
+    /* Inner rim glow */
+    radial-gradient(
+      circle at center,
+      transparent 74%,
+      rgba(255, 255, 255, 0.08) 86%,
+      rgba(255, 255, 255, 0.22) 100%
+    ),
+    /* Base: nearly fully transparent */
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    /* Outer drop shadow */
+    0 28px 60px rgba(0, 0, 0, 0.35),
+    /* Rim glow */
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    /* Top edge catch */
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.70),
+    /* Bottom edge */
+    inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+    /* Inner soft glow */
+    inset 0 0 40px rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+/* Top glare strip — the signature iOS liquid glass element */
+body.focus-minimal .focus-clock-glass::before {
+  content: "";
+  position: absolute;
+  top: 3%;
+  left: 8%;
+  right: 8%;
+  height: 22%;
+  border-radius: 50%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.38) 0%,
+    rgba(255, 255, 255, 0.10) 55%,
+    transparent 100%
+  );
+  filter: blur(3px);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Bottom subtle glow — depth */
+body.focus-minimal .focus-clock-glass::after {
+  content: "";
+  position: absolute;
+  bottom: 4%;
+  left: 15%;
+  right: 15%;
+  height: 12%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.10),
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── 3. WATER FILL ───────────────────────────────────────────────────────── */
+/* Rises from bottom. The ONLY blur in the system — so wet = blurry, dry = clear */
+.water-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: transparent;
+  /* Subtle blur — just enough to look like water distortion, not frosted glass */
+  backdrop-filter: blur(4px) saturate(1.15) brightness(1.03);
+  -webkit-backdrop-filter: blur(4px) saturate(1.15) brightness(1.03);
+  /* Crystal clear tint — barely there */
+  box-shadow:
+    inset 0 0 60px rgba(255, 255, 255, 0.04),
+    inset 0 20px 40px rgba(255, 255, 255, 0.03);
+  transition: height 0.9s linear;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── 4. WATER SURFACE — sine wave ────────────────────────────────────────── */
+/* =============================================================================
+   WAVE + BUBBLE FIX v3 — paste at bottom of pomodoro.css
+   Replaces all previous water-surface and bubble rules
+   ============================================================================= */
+
+/* Remove the old pseudo-element wave approach entirely */
+.water-surface {
+  position: absolute;
+  top: -18px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 36px;
+  pointer-events: none;
+  z-index: 3;
+  overflow: visible;
+}
+
+/* SVG is injected by JS — this just ensures it fills the space */
+.water-surface svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.water-surface::before,
+.water-surface::after {
+  display: none; /* kill old pseudo elements */
+}
+
+/* Bubbles — more visible, natural soda look */
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: radial-gradient(
+    circle at 30% 28%,
+    rgba(255, 255, 255, 0.32) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.45),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.20),
+    0 0 5px rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+
+
+@keyframes sineWave {
+  0%   {
+    transform: scaleX(1)   scaleY(1)    translateX(0%);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+  15%  {
+    transform: scaleX(1.04) scaleY(1.35) translateX(2.5%);
+    border-radius: 48% 52% 0 0 / 90% 110% 0 0;
+  }
+  30%  {
+    transform: scaleX(0.97) scaleY(0.72) translateX(4%);
+    border-radius: 52% 48% 0 0 / 110% 90% 0 0;
+  }
+  50%  {
+    transform: scaleX(1.02) scaleY(1.28) translateX(0%);
+    border-radius: 50% 50% 0 0 / 95% 105% 0 0;
+  }
+  68%  {
+    transform: scaleX(0.98) scaleY(0.68) translateX(-3.5%);
+    border-radius: 52% 48% 0 0 / 108% 92% 0 0;
+  }
+  82%  {
+    transform: scaleX(1.03) scaleY(1.30) translateX(-2%);
+    border-radius: 49% 51% 0 0 / 102% 98% 0 0;
+  }
+  100% {
+    transform: scaleX(1)   scaleY(1)    translateX(0%);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+}
+
+/* ── 5. BUBBLE CONTAINER ─────────────────────────────────────────────────── */
+.water-bubbles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* ── 6. BUBBLES ──────────────────────────────────────────────────────────── */
+/* Each bubble gets its own keyframe injected by JS for unique drift paths.
+   These are the shared base styles.                                          */
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.50);
+  background: radial-gradient(
+    circle at 30% 25%,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 100%
+  );
+  box-shadow:
+    inset 0 -1px 2px rgba(255, 255, 255, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.40),
+    0 0 4px rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+  /* animation is set inline by JS for each bubble */
+}
+
+/* Shared rise keyframe — JS overrides translateX via custom property */
+@keyframes bubbleRise {
+  0%   { transform: translateY(0%)   translateX(var(--bx0, 0px)); opacity: 0;    }
+  8%   { opacity: 0.80; }
+  25%  { transform: translateY(-18%) translateX(var(--bx1, 3px));  opacity: 0.82; }
+  45%  { transform: translateY(-34%) translateX(var(--bx2, -2px)); opacity: 0.75; }
+  65%  { transform: translateY(-50%) translateX(var(--bx3, 4px));  opacity: 0.60; }
+  80%  { opacity: 0.35; }
+  100% { transform: translateY(-65%) translateX(var(--bx4, -1px)); opacity: 0;    }
 }
