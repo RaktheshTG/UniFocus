@@ -1503,3 +1503,257 @@ img{
     animation:none !important;
   }
 }
+
+.reveal-contact-head {
+  opacity: 0;
+  transform: translateY(22px);
+  filter: blur(10px);
+  transition: opacity 0.62s ease, transform 0.62s cubic-bezier(0.22,1,0.36,1), filter 0.62s ease;
+}
+.reveal-contact-head.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Contact title — words drop in with slight rotation */
+.contact-title {
+  overflow: visible;
+}
+.contact-title-word {
+  display: inline-block;
+  margin-right: 0.2em;
+  opacity: 0;
+  transform: translateY(32px) rotate(-4deg);
+  filter: blur(6px);
+  transition:
+    opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+    transform 0.55s cubic-bezier(0.22,1,0.36,1),
+    filter 0.55s ease;
+}
+.reveal-contact-head.is-visible .contact-title-word:nth-child(1) {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg);
+  filter: blur(0);
+  transition-delay: 0.18s;
+}
+.reveal-contact-head.is-visible .contact-title-word:nth-child(2) {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg);
+  filter: blur(0);
+  transition-delay: 0.32s;
+}
+
+/* ── Contact grid ─────────────────────────────────────────────────── */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* ── Contact cards — base ─────────────────────────────────────────── */
+.contact-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 26px 24px;
+  border-radius: 28px;
+  text-decoration: none;
+  color: var(--text);
+  overflow: hidden;
+  cursor: pointer;
+  /* unique entrance: each card pulls in from a different corner */
+  opacity: 0;
+  filter: blur(12px);
+  transition:
+    transform 0.38s cubic-bezier(0.22,1,0.36,1),
+    box-shadow 0.38s ease,
+    border-color 0.38s ease,
+    background 0.38s ease,
+    opacity 0.55s ease,
+    filter 0.55s ease;
+}
+
+/* Staggered magnetic-pull entrance — each from a different direction */
+.contact-card:nth-child(1) { transform: translate(-48px, 32px) rotate(-3deg) scale(0.92); }
+.contact-card:nth-child(2) { transform: translateY(52px) scale(0.92); }
+.contact-card:nth-child(3) { transform: translate(48px, 32px) rotate(3deg) scale(0.92); }
+
+.contact-card.is-visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translate(0,0) rotate(0deg) scale(1);
+}
+.contact-card:nth-child(1).is-visible { transition-delay: 0.08s; }
+.contact-card:nth-child(2).is-visible { transition-delay: 0.18s; }
+.contact-card:nth-child(3).is-visible { transition-delay: 0.28s; }
+
+/* ── Contact card icon ────────────────────────────────────────────── */
+.contact-card-icon {
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(255,255,255,0.54));
+  border: 1px solid var(--border);
+  box-shadow: var(--button-shadow);
+  color: #1a1a1a;
+  transition: transform 0.36s cubic-bezier(0.22,1,0.36,1), background 0.36s ease, box-shadow 0.36s ease, color 0.36s ease;
+}
+
+[data-theme="dark"] .contact-card-icon {
+  background: rgba(255,255,255,0.09);
+  color: #fff;
+}
+
+.contact-card-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Icon accent colors on hover */
+.contact-card:nth-child(1):hover .contact-card-icon {
+  background: linear-gradient(135deg, #1a1a1a, #3a3a3a);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.32);
+}
+.contact-card:nth-child(2):hover .contact-card-icon {
+  background: linear-gradient(135deg, #0a66c2, #1e90ff);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(10,102,194,0.38);
+}
+.contact-card:nth-child(3):hover .contact-card-icon {
+  background: linear-gradient(135deg, #5865f2, #7289da);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(88,101,242,0.38);
+}
+
+/* ── Contact card body ────────────────────────────────────────────── */
+.contact-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-platform {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color 0.28s ease;
+}
+
+.contact-handle {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.28s ease;
+}
+
+.contact-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  transition: color 0.28s ease;
+}
+
+/* ── Arrow indicator ─────────────────────────────────────────────── */
+.contact-arrow {
+  flex: 0 0 auto;
+  font-size: 20px;
+  color: var(--muted);
+  opacity: 0.5;
+  transform: translate(0, 0);
+  transition: transform 0.28s cubic-bezier(0.22,1,0.36,1), opacity 0.28s ease, color 0.28s ease;
+  align-self: flex-start;
+}
+
+/* ── Glow layer (appears on hover) ──────────────────────────────── */
+.contact-card-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.38s ease;
+}
+.contact-card:nth-child(1) .contact-card-glow {
+  background: radial-gradient(circle at 20% 50%, rgba(232,232,232,0.18), transparent 60%);
+}
+.contact-card:nth-child(2) .contact-card-glow {
+  background: radial-gradient(circle at 20% 50%, rgba(10,102,194,0.14), transparent 60%);
+}
+.contact-card:nth-child(3) .contact-card-glow {
+  background: radial-gradient(circle at 20% 50%, rgba(88,101,242,0.14), transparent 60%);
+}
+
+/* ── Hover state ─────────────────────────────────────────────────── */
+.contact-card:hover {
+  transform: translateY(-14px) scale(1.04) !important;
+}
+
+.contact-card:nth-child(1):hover {
+  border-color: rgba(200,200,200,0.58);
+  box-shadow: 0 36px 72px rgba(0,0,0,0.22), 0 0 0 5px rgba(232,232,232,0.16);
+}
+.contact-card:nth-child(2):hover {
+  border-color: rgba(10,102,194,0.58);
+  box-shadow: 0 36px 72px rgba(10,102,194,0.24), 0 0 0 5px rgba(10,102,194,0.14);
+}
+.contact-card:nth-child(3):hover {
+  border-color: rgba(88,101,242,0.58);
+  box-shadow: 0 36px 72px rgba(88,101,242,0.24), 0 0 0 5px rgba(88,101,242,0.14);
+}
+
+.contact-card:hover .contact-card-glow { opacity: 1; }
+
+.contact-card:hover .contact-arrow {
+  transform: translate(4px, -4px);
+  opacity: 1;
+}
+
+.contact-card:nth-child(1):hover .contact-platform,
+.contact-card:nth-child(1):hover .contact-handle { color: #1a1a1a; }
+[data-theme="dark"] .contact-card:nth-child(1):hover .contact-platform,
+[data-theme="dark"] .contact-card:nth-child(1):hover .contact-handle { color: #fff; }
+
+.contact-card:nth-child(2):hover .contact-platform,
+.contact-card:nth-child(2):hover .contact-handle { color: #0a66c2; }
+
+.contact-card:nth-child(3):hover .contact-platform,
+.contact-card:nth-child(3):hover .contact-handle { color: #5865f2; }
+
+.contact-card:hover .contact-icon-icon { transform: rotate(-8deg) scale(1.18); }
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 840px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+  .contact-card:nth-child(1),
+  .contact-card:nth-child(2),
+  .contact-card:nth-child(3) {
+    transform: translateY(36px) scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-contact-head,
+  .contact-card,
+  .contact-title-word {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

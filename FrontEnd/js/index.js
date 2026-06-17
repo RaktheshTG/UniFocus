@@ -100,6 +100,31 @@ function initScrollReveal(){
   initSectionTitleAnimations();
   initScrollReveal();
 
+  function initContactReveal() {
+  const head = document.querySelector(".reveal-contact-head");
+  const cards = document.querySelectorAll(".contact-card");
+  if (!head && !cards.length) return;
+
+  if (!("IntersectionObserver" in window)) {
+    if (head) head.classList.add("is-visible");
+    cards.forEach(c => c.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px 0px 0px" });
+
+  if (head) observer.observe(head);
+  cards.forEach(c => observer.observe(c));
+}
+
+initContactReveal(); 
+
   // Handle Hero Cursor persistence: Wait for typing (4.2s) + 5 seconds then hide
   setTimeout(() => {
     const quote = document.querySelector('.typing-quote');
