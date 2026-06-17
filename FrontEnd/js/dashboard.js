@@ -237,7 +237,7 @@ function showToast(msg){
 
     function logout(){
       ["user_id","full_name","email"].forEach((key)=>localStorage.removeItem(key));
-      window.location.href="login page.html";
+      window.location.href="login.html";
     }
 
 function toggleTheme(){

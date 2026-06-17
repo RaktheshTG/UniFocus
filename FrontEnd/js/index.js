@@ -24,7 +24,7 @@ function updateAuthUi(){
 }
 
 function goPrimary(){
-  const url = isLoggedIn() ? "login page.html" : "SignUp.html";
+  const url = isLoggedIn() ? "login.html" : "SignUp.html";
   const primaryCta = document.getElementById("primaryCta");
   if(typeof window.playZoomToPage === "function" && primaryCta){
     window.playZoomToPage(url, primaryCta);
@@ -36,7 +36,7 @@ function goPrimary(){
 function logout(){
   AUTH_KEYS.forEach((key) => localStorage.removeItem(key));
   updateAuthUi();
-  window.location.href = "login page.html";
+  window.location.href = "login.html";
 }
 
 function initSectionTitleAnimations(){

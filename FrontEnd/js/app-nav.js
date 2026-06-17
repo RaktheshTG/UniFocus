@@ -9,7 +9,7 @@ function logout(){
   ["user_id","full_name","email"].forEach(function(key){
     localStorage.removeItem(key);
   });
-  window.location.href = "login page.html";
+  window.location.href = "login.html";
 }
 
 // Ensure navbar theme glyph stays in sync across pages that define

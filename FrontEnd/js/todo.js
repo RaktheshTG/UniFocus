@@ -9,7 +9,7 @@
 
     function getUserId(){
       const id=localStorage.getItem("user_id");
-      if(!id){ alert("Please login first"); window.location.href="login page.html"; return null; }
+      if(!id){ alert("Please login first"); window.location.href="login.html"; return null; }
       return Number(id);
     }
 

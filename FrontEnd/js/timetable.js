@@ -10,7 +10,7 @@
       const id = localStorage.getItem("user_id");
       if (!id) {
         alert("Please login first");
-        window.location.href = "login page.html";
+        window.location.href = "login.html";
       }
       return Number(id);
     }
